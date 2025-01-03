@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+</head>
+<body>
+<h1>ST03 webservice Ver.2</h1>
+<div class="col-md-12">
+    <!-- 로그인 기능 영역 -->
+    <div class="row">
+        <div class="col-md-6">
+<!--            <a href="/posts/save" role="button" class="btn btn-primary">post project</a>-->
+
+            {{#userName}} <!-- 로그인한 경우 -->
+                Logged in as: <span id="user">{{userName}}</span>
+                <a href="/logout" class="btn btn-info active" role="button">Logout</a>
+            {{/userName}}
+
+            {{^userName}} <!-- 로그인하지 않은 경우 -->
+                <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
+            {{/userName}}
+        </div>
+    </div>
+    <br>
+</div>
+</body>
+</html>
