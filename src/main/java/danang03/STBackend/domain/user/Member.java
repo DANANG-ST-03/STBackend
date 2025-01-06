@@ -19,7 +19,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "`user`")
 public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

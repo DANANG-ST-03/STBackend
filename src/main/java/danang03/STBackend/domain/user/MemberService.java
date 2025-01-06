@@ -4,6 +4,8 @@ import danang03.STBackend.config.auth.JwtTokenProvider;
 import danang03.STBackend.config.auth.dto.JwtToken;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class MemberService {
+    private static final Logger log = LoggerFactory.getLogger(MemberService.class);
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -57,18 +60,21 @@ public class MemberService {
     }
 
     @Transactional
-    public JwtToken signIn(String username, String password) {
+    public JwtToken signIn(String email, String password) {
         try {
-            // 1. username + password 를 기반으로 Authentication 객체 생성
+            // 1. email + password 를 기반으로 Authentication 객체 생성
             UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(username, password);
-
+                    new UsernamePasswordAuthenticationToken(email, password);
+            log.info("로그인 1단계 완료");
             // 2. 실제 검증. authenticate() 메서드 실행 시 인증 실패 시 예외 발생
             Authentication authentication =
                     authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            log.info("로그인 2단계 완료");
 
             // 3. 인증 정보를 기반으로 JWT 토큰 생성
             JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+            log.info("로그인 3단계 완료");
+
 
             return jwtToken;
 

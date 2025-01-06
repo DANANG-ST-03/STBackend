@@ -1,12 +1,18 @@
 package danang03.STBackend.config.auth;
 
 import danang03.STBackend.config.auth.dto.JwtToken;
+import danang03.STBackend.config.auth.dto.SignInResponse;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
+import danang03.STBackend.config.auth.dto.SignUpResponse;
 import danang03.STBackend.config.auth.dto.SigninRequest;
 import danang03.STBackend.domain.user.MemberService;
+import danang03.STBackend.dto.GlobalResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -14,6 +20,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @Slf4j
@@ -41,14 +53,27 @@ public class AuthController {
         }
 
         try {
-            memberService.signUp(request);
-            return ResponseEntity.ok("회원가입이 성공적으로 완료되었습니다.");
+            Long memberId = memberService.signUp(request);
+            SignUpResponse signUpResponse = new SignUpResponse(memberId);
+            GlobalResponse globalResponse = GlobalResponse.builder()
+                    .status(200)
+                    .message("signup success")
+                    .data(signUpResponse).build();
+            return ResponseEntity.ok(globalResponse);
         } catch (IllegalArgumentException e) {
             // 이메일 중복 등 비즈니스 로직 예외 처리
-            return ResponseEntity.badRequest().body(e.getMessage());
+            GlobalResponse globalResponse = GlobalResponse.builder()
+                    .status(400)
+                    .message("This is a duplicate email.")
+                    .data(null).build();
+            return ResponseEntity.badRequest().body(globalResponse);
         } catch (Exception e) {
             // 기타 예외 처리
-            return ResponseEntity.status(500).body("서버 에러가 발생했습니다.");
+            GlobalResponse globalResponse = GlobalResponse.builder()
+                    .status(500)
+                    .message("server error occurred")
+                    .data(null).build();
+            return ResponseEntity.status(500).body(globalResponse);
         }
     }
 
@@ -59,8 +84,9 @@ public class AuthController {
     }
 
 
+
     @PostMapping("/signin")
-    public ResponseEntity<?> login(@RequestBody SigninRequest request) {
+    public ResponseEntity<?> login(@RequestBody SigninRequest request, HttpServletResponse response) {
         String email = request.getEmail();
         String password = request.getPassword();
 
@@ -71,15 +97,39 @@ public class AuthController {
             log.info("request email = {}, password = {}", email, password);
             log.info("jwtToken accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
 
-            return ResponseEntity.ok(jwtToken);
+            // Access Token을 헤더에 추가
+            response.setHeader("Authorization", "Bearer " + jwtToken.getAccessToken());
+
+            // Refresh Token을 헤더에 추가 (선택 사항)
+            response.setHeader("Refresh-Token", jwtToken.getRefreshToken());
+
+            // 응답 바디를 구성하여 클라이언트에 추가 데이터 반환
+            GlobalResponse globalResponse = GlobalResponse.builder()
+                    .status(200)
+                    .message("login success")
+                    .data(jwtToken)
+                    .build();
+
+            return ResponseEntity.ok(globalResponse);
+
         } catch (IllegalArgumentException e) {
             // 로그인 실패 처리
             log.error("로그인 실패: {}", e.getMessage());
-            return ResponseEntity.status(401).body("로그인에 실패했습니다. " + e.getMessage());
+            GlobalResponse globalResponse = GlobalResponse.builder()
+                    .status(401)
+                    .message("로그인에 실패했습니다. " + e.getMessage())
+                    .data(null)
+                    .build();
+            return ResponseEntity.status(401).body(globalResponse);
         } catch (Exception e) {
             // 기타 예외 처리
             log.error("서버 에러 발생: {}", e.getMessage());
-            return ResponseEntity.status(500).body("서버 에러가 발생했습니다.");
+            GlobalResponse globalResponse = GlobalResponse.builder()
+                    .status(500)
+                    .message("서버 에러가 발생했습니다.")
+                    .data(null)
+                    .build();
+            return ResponseEntity.status(500).body(globalResponse);
         }
     }
 
