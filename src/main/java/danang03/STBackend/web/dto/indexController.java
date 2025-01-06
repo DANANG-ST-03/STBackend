@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @Controller
@@ -23,5 +22,27 @@ public class indexController {
             model.addAttribute("userName", user.getName());
         }
         return "index";
+    }
+
+    @GetMapping("/main")
+    public String index2(Model model) {
+//        model.addAttribute("posts", postsService.
+//                findAllDesc());
+        SessionUser user = (SessionUser) httpSession.
+                getAttribute("user");
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+        }
+        return "index";
+    }
+
+    @GetMapping("/secret")
+    public String getSecret(Model model) {
+        SessionUser user = (SessionUser) httpSession.
+                getAttribute("user");
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+        }
+        return "secret";
     }
 }

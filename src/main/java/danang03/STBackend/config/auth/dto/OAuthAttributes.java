@@ -1,9 +1,8 @@
 package danang03.STBackend.config.auth.dto;
 
 import danang03.STBackend.domain.user.Role;
-import danang03.STBackend.domain.user.User;
+import danang03.STBackend.domain.user.Member;
 import java.util.Map;
-import javax.print.DocFlavor.STRING;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -39,8 +38,8 @@ public class OAuthAttributes {
                 .build();
     }
 
-    public User toEntity() {
-        return User.builder()
+    public Member toEntity() {
+        return Member.builder()
                 .name(name)
                 .email(email)
                 .picture(picture)
