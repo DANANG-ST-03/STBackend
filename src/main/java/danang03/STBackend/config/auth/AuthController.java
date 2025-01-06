@@ -4,10 +4,12 @@ import danang03.STBackend.config.auth.dto.JwtToken;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
 import danang03.STBackend.config.auth.dto.SigninRequest;
 import danang03.STBackend.domain.user.MemberService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,10 +33,23 @@ public class AuthController {
 
     // 회원가입 처리
     @PostMapping("/signup")
-    public String signup(SignUpRequest request) {
-        memberService.signUp(request);
-        // 회원가입 후 로그인 페이지로 이동 or 메인 페이지 등
-        return "redirect:/login";
+    public ResponseEntity<?> signup(@Valid @RequestBody SignUpRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // 유효성 검사 실패
+            String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
+
+        try {
+            memberService.signUp(request);
+            return ResponseEntity.ok("회원가입이 성공적으로 완료되었습니다.");
+        } catch (IllegalArgumentException e) {
+            // 이메일 중복 등 비즈니스 로직 예외 처리
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            // 기타 예외 처리
+            return ResponseEntity.status(500).body("서버 에러가 발생했습니다.");
+        }
     }
 
 
@@ -45,19 +60,27 @@ public class AuthController {
 
 
     @PostMapping("/signin")
-    public String login(@RequestBody SigninRequest request) {
+    public ResponseEntity<?> login(@RequestBody SigninRequest request) {
         String email = request.getEmail();
         String password = request.getPassword();
 
-        // 로그인 처리 및 JWT 발급
-        JwtToken jwtToken = memberService.signIn(email, password);
+        try {
+            // 로그인 처리 및 JWT 발급
+            JwtToken jwtToken = memberService.signIn(email, password);
 
-        log.info("request email = {}, password = {}", email, password);
-        log.info("jwtToken accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
+            log.info("request email = {}, password = {}", email, password);
+            log.info("jwtToken accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
 
-        // 클라이언트 측에서 JWT를 사용하도록 하기 위해 세션이나 쿠키에 저장
-        // 아래는 쿠키에 저장하는 예시
-        return "redirect:/?accessToken=" + jwtToken.getAccessToken() + "&refreshToken=" + jwtToken.getRefreshToken();
+            return ResponseEntity.ok(jwtToken);
+        } catch (IllegalArgumentException e) {
+            // 로그인 실패 처리
+            log.error("로그인 실패: {}", e.getMessage());
+            return ResponseEntity.status(401).body("로그인에 실패했습니다. " + e.getMessage());
+        } catch (Exception e) {
+            // 기타 예외 처리
+            log.error("서버 에러 발생: {}", e.getMessage());
+            return ResponseEntity.status(500).body("서버 에러가 발생했습니다.");
+        }
     }
 
 //    public String login(LoginRequest request) {

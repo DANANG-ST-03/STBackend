@@ -26,36 +26,55 @@ public class MemberService {
             throw new IllegalArgumentException("이미 가입된 이메일입니다.");
         }
 
+        // 이름, 이메일, 비밀번호가 비어 있지 않은지 확인
+        if (request.getName() == null || request.getName().isEmpty()) {
+            throw new IllegalArgumentException("이름은 필수 입력값입니다.");
+        }
+
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("비밀번호는 필수 입력값입니다.");
+        }
+
+        // 이메일 중복 체크
+        if (memberRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
+        }
+
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        // User 엔티티 생성 및 DB 저장
+        // User 엔티티 생성 및 저장
         Member user = Member.builder()
                 .name(request.getName())
                 .email(request.getEmail())
-                .picture(null)
+                .password(encodedPassword)
                 .role(Role.ADMIN)
                 .build();
 
         memberRepository.save(user);
-        System.out.println(memberRepository.findAll().toString());
 
         return user.getId();
     }
 
     @Transactional
     public JwtToken signIn(String username, String password) {
-        // 1. username + password 를 기반으로 Authentication 객체 생성
-        // 이때 authentication 은 인증 여부를 확인하는 authenticated 값이 false
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        try {
+            // 1. username + password 를 기반으로 Authentication 객체 생성
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(username, password);
 
-        // 2. 실제 검증. authenticate() 메서드를 통해 요청된 Member 에 대한 검증 진행
-        // authenticate 메서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드 실행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            // 2. 실제 검증. authenticate() 메서드 실행 시 인증 실패 시 예외 발생
+            Authentication authentication =
+                    authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+            // 3. 인증 정보를 기반으로 JWT 토큰 생성
+            JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
 
-        return jwtToken;
+            return jwtToken;
+
+        } catch (Exception e) {
+            // 인증 실패 시 명시적으로 예외 발생
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
+        }
     }
 }
