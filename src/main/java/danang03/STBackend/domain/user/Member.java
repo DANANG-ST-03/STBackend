@@ -1,0 +1,92 @@
+package danang03.STBackend.domain.user;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.util.Collection;
+import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+@Getter
+@Entity
+@NoArgsConstructor
+@Table(name = "`user`")
+public class Member implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column
+    private String username;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column
+    private String picture;
+
+    @Column
+    private String password;
+
+//    @Column(nullable = false)
+//    private String contact;
+//
+//    @Column(nullable = false)
+//    private String skills;
+//
+//    @Column(nullable = false)
+//    private LocalDate joiningDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+//    @Builder
+//    public User(String name, String email, String picture, String contact, String skills, LocalDate joiningDate, Role role) {
+//        this.name = name;
+//        this.email = email;
+//        this.picture = picture;
+//        this.contact = contact;
+//        this.skills = skills;
+//        this.joiningDate = joiningDate;
+//        this.role = role;
+//    }
+
+    @Builder
+    public Member(String name, String username, String password, String email, String picture, Role role) {
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.picture = picture;
+        this.role = role;
+    }
+
+    // 소셜로그인으로 구글에서 데이터 받아와서 업데이트하는 함수
+    public Member update(String name, String picture) {
+        this.name = name;
+        this.picture = picture;
+        return this;
+    }
+
+    public String getRoleKey() {
+        return this.role.getKey();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+}
