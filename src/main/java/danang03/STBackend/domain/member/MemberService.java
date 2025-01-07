@@ -1,4 +1,4 @@
-package danang03.STBackend.domain.user;
+package danang03.STBackend.domain.member;
 
 import danang03.STBackend.config.auth.JwtTokenProvider;
 import danang03.STBackend.config.auth.dto.JwtToken;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

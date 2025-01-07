@@ -1,4 +1,4 @@
-package danang03.STBackend.domain.user;
+package danang03.STBackend.domain.member;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,30 +1,20 @@
 package danang03.STBackend.config.auth;
 
 import danang03.STBackend.config.auth.dto.JwtToken;
-import danang03.STBackend.config.auth.dto.SignInResponse;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
 import danang03.STBackend.config.auth.dto.SignUpResponse;
 import danang03.STBackend.config.auth.dto.SigninRequest;
-import danang03.STBackend.domain.user.MemberService;
+import danang03.STBackend.domain.member.MemberService;
 import danang03.STBackend.dto.GlobalResponse;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
