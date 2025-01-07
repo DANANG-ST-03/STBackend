@@ -25,4 +25,25 @@ public class EmployeeService {
 
         return employee.getId();
     }
+
+    @Transactional
+    public Long updateEmployee(UpdateEmployeeRequest request) {
+        Employee employee = employeeRepository.findById(request.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+
+        // 업데이트 메서드 호출
+        employee.update(
+                request.getName(),
+                request.getEmail(),
+//                request.getPicture(),
+                request.getContact(),
+                request.getSkills(),
+                request.getJoiningDate()
+        );
+
+
+        // save 호출 없이 변경 자동 반영 (Transactional로 관리 중)
+        return employee.getId();
+    }
+
 }

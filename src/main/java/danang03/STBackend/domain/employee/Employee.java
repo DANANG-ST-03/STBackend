@@ -29,8 +29,16 @@ public class Employee {
 
 //    private String picture;
     private String contact;
-
     private String skills;
-
     private LocalDate joiningDate;
+
+
+    // 업데이트를 위한 메서드
+    public void update(String name, String email, String contact, String skills, LocalDate joiningDate) {
+        this.name = name != null ? name : this.name;
+        this.email = email != null ? email : this.email;
+        this.contact = contact != null ? contact : this.contact;
+        this.skills = skills != null ? skills : this.skills;
+        this.joiningDate = joiningDate != null ? joiningDate : this.joiningDate;
+    }
 }
