@@ -1,15 +1,15 @@
 package danang03.STBackend.domain.projects;
 
-import jakarta.persistence.Column;
+import danang03.STBackend.domain.member.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import java.time.LocalDate;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,24 +20,26 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Project {
+public class EmployeeProject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "employee", nullable = false)
+    private Member employee;
 
-    private String description;
-
-    private LocalDate startDate;
-
-    private LocalDate endDate;
+    @ManyToOne
+    @JoinColumn(name = "project", nullable = false)
+    private Project project;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Role role;
 
-    public enum Status {
-        WORKING, COMPLETE, PENDING
+    @Lob
+    private String contribution;
+
+    public enum Role {
+        MANAGER, DEVELOPER, DESIGNER
     }
 }
