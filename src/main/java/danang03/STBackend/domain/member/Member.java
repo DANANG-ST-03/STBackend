@@ -36,13 +36,10 @@ public class Member implements UserDetails {
     @Column
     private String password;
 
-    @Column(nullable = false)
     private String contact;
 
-    @Column(nullable = false)
     private String skills;
 
-    @Column(nullable = false)
     private LocalDate joiningDate;
 
     @Enumerated(EnumType.STRING)
