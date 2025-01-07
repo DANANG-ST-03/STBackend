@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,6 +52,7 @@ public class AuthController {
             String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
             return ResponseEntity.badRequest().body(errorMessage);
         }
+        log.info("signup 유효성검사 굿");
 
         try {
             Long memberId = memberService.signUp(request);
@@ -84,7 +86,7 @@ public class AuthController {
     }
 
 
-
+    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/signin")
     public ResponseEntity<?> login(@RequestBody SigninRequest request, HttpServletResponse response) {
         String email = request.getEmail();
@@ -106,7 +108,7 @@ public class AuthController {
             // 응답 바디를 구성하여 클라이언트에 추가 데이터 반환
             GlobalResponse globalResponse = GlobalResponse.builder()
                     .status(200)
-                    .message("login success")
+                    .message("signin success")
                     .data(jwtToken)
                     .build();
 
