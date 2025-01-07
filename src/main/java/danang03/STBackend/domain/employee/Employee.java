@@ -27,8 +27,7 @@ public class Employee {
     @Column(nullable = false, unique = true)
     private String email;
 
-    private String picture;
-
+//    private String picture;
     private String contact;
 
     private String skills;
