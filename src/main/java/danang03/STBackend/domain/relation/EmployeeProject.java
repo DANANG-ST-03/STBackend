@@ -1,6 +1,8 @@
-package danang03.STBackend.domain.projects;
+package danang03.STBackend.domain.relation;
 
+import danang03.STBackend.domain.employee.Employee;
 import danang03.STBackend.domain.member.Member;
+import danang03.STBackend.domain.projects.Project;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,7 +29,7 @@ public class EmployeeProject {
 
     @ManyToOne
     @JoinColumn(name = "employee", nullable = false)
-    private Member employee;
+    private Employee employee;
 
     @ManyToOne
     @JoinColumn(name = "project", nullable = false)
