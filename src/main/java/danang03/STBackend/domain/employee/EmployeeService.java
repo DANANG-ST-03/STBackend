@@ -14,6 +14,12 @@ public class EmployeeService {
     }
 
     public Long createEmployee(AddEmployeeRequest request) {
+        // 중복 email 체크
+        boolean exists = employeeRepository.existsByEmail(request.getEmail());
+        if (exists) {
+            throw new IllegalArgumentException("Employee with the same email already exists");
+        }
+
         Employee employee = Employee.builder()
                 .name(request.getName())
                 .email(request.getEmail())
