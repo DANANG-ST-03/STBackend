@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Integer> {
     Optional<Member> findByEmail(String email);
-    Optional<Member> findByUsername(String username);
 
     // 이메일 기준으로 중복 여부를 확인하기 위해
     boolean existsByEmail(String email);

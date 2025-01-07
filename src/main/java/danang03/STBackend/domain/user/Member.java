@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import lombok.Builder;
@@ -27,10 +28,7 @@ public class Member implements UserDetails {
     @Column(nullable = false)
     private String name;
 
-    @Column
-    private String username;
-
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column
@@ -39,39 +37,39 @@ public class Member implements UserDetails {
     @Column
     private String password;
 
-//    @Column(nullable = false)
-//    private String contact;
-//
-//    @Column(nullable = false)
-//    private String skills;
-//
-//    @Column(nullable = false)
-//    private LocalDate joiningDate;
+    @Column(nullable = false)
+    private String contact;
+
+    @Column(nullable = false)
+    private String skills;
+
+    @Column(nullable = false)
+    private LocalDate joiningDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
-//    @Builder
-//    public User(String name, String email, String picture, String contact, String skills, LocalDate joiningDate, Role role) {
-//        this.name = name;
-//        this.email = email;
-//        this.picture = picture;
-//        this.contact = contact;
-//        this.skills = skills;
-//        this.joiningDate = joiningDate;
-//        this.role = role;
-//    }
-
     @Builder
-    public Member(String name, String username, String password, String email, String picture, Role role) {
+    public Member(String name, String email, String picture, String password, String contact, String skills, LocalDate joiningDate, Role role) {
         this.name = name;
-        this.username = username;
-        this.password = password;
         this.email = email;
         this.picture = picture;
+        this.password = password;
+        this.contact = contact;
+        this.skills = skills;
+        this.joiningDate = joiningDate;
         this.role = role;
     }
+
+//    @Builder
+//    public Member(String name, String password, String email, String picture, Role role) {
+//        this.name = name;
+//        this.password = password;
+//        this.email = email;
+//        this.picture = picture;
+//        this.role = role;
+//    }
 
     // 소셜로그인으로 구글에서 데이터 받아와서 업데이트하는 함수
     public Member update(String name, String picture) {
@@ -87,5 +85,10 @@ public class Member implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email; // email을 username 대용으로 사용
     }
 }
