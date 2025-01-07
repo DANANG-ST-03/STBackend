@@ -35,9 +35,5 @@ public class Project {
     private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
-
-    public enum Status {
-        WORKING, COMPLETE, PENDING
-    }
+    private ProjectStatus status;
 }
