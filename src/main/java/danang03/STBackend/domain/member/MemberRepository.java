@@ -1,11 +1,12 @@
-package danang03.STBackend.domain.user;
+package danang03.STBackend.domain.member;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MemberRepository extends JpaRepository<Member, Integer> {
+public interface MemberRepository extends JpaRepository<Member, Integer>, PagingAndSortingRepository<Member, Integer> {
     Optional<Member> findByEmail(String email);
     Optional<Member> findByUsername(String username);
 

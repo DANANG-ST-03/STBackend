@@ -5,7 +5,7 @@ import danang03.STBackend.config.auth.dto.SignInResponse;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
 import danang03.STBackend.config.auth.dto.SignUpResponse;
 import danang03.STBackend.config.auth.dto.SigninRequest;
-import danang03.STBackend.domain.user.MemberService;
+import danang03.STBackend.domain.member.MemberService;
 import danang03.STBackend.dto.GlobalResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,6 +1,6 @@
 package danang03.STBackend.config.auth.dto;
 
-import danang03.STBackend.domain.user.Member;
+import danang03.STBackend.domain.member.Member;
 import java.io.Serializable;
 import lombok.Getter;
 
