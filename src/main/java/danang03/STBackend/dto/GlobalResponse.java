@@ -11,4 +11,8 @@ public class GlobalResponse {
     private int status;
     private String message;
     private Object data;
+
+    public String toString() {
+        return "(status=" + status + ", message=" + message + ", data=" + data.toString() + ")";
+    }
 }
