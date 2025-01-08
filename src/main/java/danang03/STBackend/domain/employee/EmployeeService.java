@@ -1,8 +1,11 @@
 package danang03.STBackend.domain.employee;
 
 import danang03.STBackend.domain.employee.dto.AddEmployeeRequest;
+import danang03.STBackend.domain.employee.dto.EmployeeResponse;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +28,6 @@ public class EmployeeService {
         Employee employee = Employee.builder()
                 .name(request.getName())
                 .email(request.getEmail())
-//                .picture(request.getPicture())
                 .contact(request.getContact())
                 .skills(request.getSkills())
                 .joiningDate(request.getJoiningDate()).build();
@@ -34,24 +36,42 @@ public class EmployeeService {
         return employee.getId();
     }
 
+    public Page<EmployeeResponse> getEmployees(Pageable pageable) {
+        return employeeRepository.findAll(pageable)
+                .map(employee -> new EmployeeResponse(
+                        employee.getId(),
+                        employee.getName(),
+                        employee.getEmail(),
+                        employee.getContact(),
+                        employee.getSkills(),
+                        employee.getJoiningDate(),
+                        employee.getRole()
+                ));
+    }
+
+
     @Transactional
-    public Long updateEmployee(UpdateEmployeeRequest request) {
-        Employee employee = employeeRepository.findById(request.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+    public void updateEmployee(Long id, UpdateEmployeeRequest request) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Employee with id " + id + "not found"));
 
         // 업데이트 메서드 호출
         employee.update(
                 request.getName(),
                 request.getEmail(),
-//                request.getPicture(),
                 request.getContact(),
                 request.getSkills(),
-                request.getJoiningDate()
+                request.getJoiningDate(),
+                request.getRole()
         );
 
-
-        // save 호출 없이 변경 자동 반영 (Transactional로 관리 중)
-        return employee.getId();
     }
 
+
+    public void deleteEmployee(Long id) {
+        if (!employeeRepository.existsById(id)) {
+            throw new IllegalArgumentException("employee with id " + id + " not found");
+        }
+        employeeRepository.deleteById(id);
+    }
 }

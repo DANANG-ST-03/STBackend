@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<GlobalResponse> handleAllExceptions(Exception ex) {
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(500)
-                .message("An unexpected error occurred")
+                .message(ex.getMessage())
                 .data(null).build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(globalResponse);
     }

@@ -1,10 +1,13 @@
 package danang03.STBackend.domain.employee.dto;
-
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class UpdateEmployeeRequest {
+@AllArgsConstructor
+public class EmployeeResponse {
+    private Long id;
     private String name;
     private String email;
     private String contact;

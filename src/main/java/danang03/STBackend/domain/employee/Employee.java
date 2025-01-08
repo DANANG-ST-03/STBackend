@@ -26,19 +26,18 @@ public class Employee {
 
     @Column(nullable = false, unique = true)
     private String email;
-
-//    private String picture;
     private String contact;
     private String skills;
     private LocalDate joiningDate;
-
+    private String role;
 
     // 업데이트를 위한 메서드
-    public void update(String name, String email, String contact, String skills, LocalDate joiningDate) {
+    public void update(String name, String email, String contact, String skills, LocalDate joiningDate, String role) {
         this.name = name != null ? name : this.name;
         this.email = email != null ? email : this.email;
         this.contact = contact != null ? contact : this.contact;
         this.skills = skills != null ? skills : this.skills;
         this.joiningDate = joiningDate != null ? joiningDate : this.joiningDate;
+        this.role = role != null ? role : this.role;
     }
 }

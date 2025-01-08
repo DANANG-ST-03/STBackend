@@ -36,4 +36,13 @@ public class Project {
 
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
+
+    // 업데이트를 위한 메서드
+    public void update(String name, String description, LocalDate startDate, LocalDate endDate, ProjectStatus status) {
+        this.name = name != null ? name : this.name;
+        this.description = description != null ? description : this.description;
+        this.startDate = startDate != null ? startDate : this.startDate;
+        this.endDate = endDate != null ? endDate : this.endDate;
+        this.status = status != null ? status : this.status;
+    }
 }

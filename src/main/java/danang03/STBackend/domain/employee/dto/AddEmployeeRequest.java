@@ -7,8 +7,8 @@ import lombok.Getter;
 public class AddEmployeeRequest {
     private String name;
     private String email;
-//    private String picture;
     private String contact;
     private String skills;
     private LocalDate joiningDate;
+    private String role;
 }
