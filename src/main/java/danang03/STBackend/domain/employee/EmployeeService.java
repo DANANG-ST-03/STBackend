@@ -53,13 +53,12 @@ public class EmployeeService {
     @Transactional
     public void updateEmployee(Long id, UpdateEmployeeRequest request) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Employee with id " + id + "not found"));
 
         // 업데이트 메서드 호출
         employee.update(
                 request.getName(),
                 request.getEmail(),
-//                request.getPicture(),
                 request.getContact(),
                 request.getSkills(),
                 request.getJoiningDate(),
@@ -70,6 +69,9 @@ public class EmployeeService {
 
 
     public void deleteEmployee(Long id) {
+        if (!employeeRepository.existsById(id)) {
+            throw new IllegalArgumentException("employee with id " + id + " not found");
+        }
         employeeRepository.deleteById(id);
     }
 }
