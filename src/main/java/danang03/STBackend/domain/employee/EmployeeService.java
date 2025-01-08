@@ -50,8 +50,8 @@ public class EmployeeService {
         );
 
 
-        // save 호출 없이 변경 자동 반영 (Transactional로 관리 중)
-        return employee.getId();
+    public void deleteEmployee(Long id) {
+        employeeRepository.deleteById(id);
     }
 
 }

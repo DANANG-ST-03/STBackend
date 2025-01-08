@@ -48,4 +48,15 @@ public class EmployeeController {
 
         return ResponseEntity.ok(globalResponse);
     }
+
+    // delete api
+    @DeleteMapping("/{id}")
+    public ResponseEntity<GlobalResponse> deleteEmployee(@PathVariable Long id) {
+        employeeService.deleteEmployee(id);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("deleted employee successfully")
+                .data(null).build();
+        return ResponseEntity.ok(globalResponse);
+    }
 }
