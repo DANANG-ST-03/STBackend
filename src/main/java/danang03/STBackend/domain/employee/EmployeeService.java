@@ -25,7 +25,6 @@ public class EmployeeService {
         Employee employee = Employee.builder()
                 .name(request.getName())
                 .email(request.getEmail())
-//                .picture(request.getPicture())
                 .contact(request.getContact())
                 .skills(request.getSkills())
                 .joiningDate(request.getJoiningDate()).build();
@@ -46,7 +45,8 @@ public class EmployeeService {
 //                request.getPicture(),
                 request.getContact(),
                 request.getSkills(),
-                request.getJoiningDate()
+                request.getJoiningDate(),
+                request.getRole()
         );
 
 

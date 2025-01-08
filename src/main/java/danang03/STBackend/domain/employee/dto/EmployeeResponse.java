@@ -7,8 +7,8 @@ public class EmployeeResponse {
     private Long id;
     private String name;
     private String email;
-    //    private String picture;
     private String contact;
     private String skills;
     private LocalDate joiningDate;
+    private String role;
 }
