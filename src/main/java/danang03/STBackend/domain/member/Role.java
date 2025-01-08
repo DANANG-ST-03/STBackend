@@ -1,4 +1,4 @@
-package danang03.STBackend.domain.user;
+package danang03.STBackend.domain.member;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package danang03.STBackend.config.auth;
 
-import danang03.STBackend.domain.user.CustomUserDetailsService;
+import danang03.STBackend.domain.member.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

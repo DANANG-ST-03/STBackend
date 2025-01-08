@@ -3,8 +3,8 @@ package danang03.STBackend.config.auth;
 
 import danang03.STBackend.config.auth.dto.OAuthAttributes;
 import danang03.STBackend.config.auth.dto.SessionUser;
-import danang03.STBackend.domain.user.Member;
-import danang03.STBackend.domain.user.MemberRepository;
+import danang03.STBackend.domain.member.Member;
+import danang03.STBackend.domain.member.MemberRepository;
 import jakarta.servlet.http.HttpSession;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
