@@ -35,8 +35,8 @@ public class EmployeeService {
     }
 
     @Transactional
-    public Long updateEmployee(UpdateEmployeeRequest request) {
-        Employee employee = employeeRepository.findById(request.getId())
+    public void updateEmployee(Long id, UpdateEmployeeRequest request) {
+        Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
 
         // 업데이트 메서드 호출

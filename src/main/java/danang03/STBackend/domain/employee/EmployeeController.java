@@ -37,10 +37,10 @@ public class EmployeeController {
         return ResponseEntity.ok(globalResponse);
     }
 
-    @PutMapping
-    public ResponseEntity<GlobalResponse> updateEmployee(@RequestBody UpdateEmployeeRequest request) {
-        Long employeeId = employeeService.updateEmployee(request);
-        UpdateEmployeeResponse updateEmployeeResponse = new UpdateEmployeeResponse(employeeId);
+    @PutMapping("{id}")
+    public ResponseEntity<GlobalResponse> updateEmployee(@PathVariable Long id, @RequestBody UpdateEmployeeRequest request) {
+        employeeService.updateEmployee(id, request);
+        UpdateEmployeeResponse updateEmployeeResponse = new UpdateEmployeeResponse(id);
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("updated employee successfully")

@@ -5,8 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class UpdateEmployeeRequest {
-    private Long id; // 업데이트할 Employee의 ID
-
     private String name;
     private String email;
 //    private String picture;
