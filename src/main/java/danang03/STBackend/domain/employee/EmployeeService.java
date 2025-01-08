@@ -1,8 +1,11 @@
 package danang03.STBackend.domain.employee;
 
 import danang03.STBackend.domain.employee.dto.AddEmployeeRequest;
+import danang03.STBackend.domain.employee.dto.EmployeeResponse;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,20 @@ public class EmployeeService {
 
         return employee.getId();
     }
+
+    public Page<EmployeeResponse> getEmployees(Pageable pageable) {
+        return employeeRepository.findAll(pageable)
+                .map(employee -> new EmployeeResponse(
+                        employee.getId(),
+                        employee.getName(),
+                        employee.getEmail(),
+                        employee.getContact(),
+                        employee.getSkills(),
+                        employee.getJoiningDate(),
+                        employee.getRole()
+                ));
+    }
+
 
     @Transactional
     public void updateEmployee(Long id, UpdateEmployeeRequest request) {
