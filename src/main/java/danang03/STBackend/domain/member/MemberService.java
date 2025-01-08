@@ -3,9 +3,13 @@ package danang03.STBackend.domain.member;
 import danang03.STBackend.config.auth.JwtTokenProvider;
 import danang03.STBackend.config.auth.dto.JwtToken;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
+import danang03.STBackend.domain.member.dto.MemberDto;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -81,5 +85,19 @@ public class MemberService {
             // 인증 실패 시 명시적으로 예외 발생
             throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
+    }
+
+    public Page<MemberDto> getMembersDto(Pageable pageable) {
+        return memberRepository.findAll(pageable)
+                .map(member -> new MemberDto(
+                        member.getId(),
+                        member.getName(),
+                        member.getUsername(),
+                        member.getEmail(),
+                        member.getPicture()
+                ));
+    }
+    public Page<Member> getMembers(Pageable pageable) {
+        return memberRepository.findAll(pageable);
     }
 }
