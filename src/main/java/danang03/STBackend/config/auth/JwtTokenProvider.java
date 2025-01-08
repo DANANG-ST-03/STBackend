@@ -54,7 +54,7 @@ public class JwtTokenProvider {
                 .setSubject(authentication.getName()) // 토큰 주제 설정
                 .claim("auth", authorities) // 사용자 권한 설정
                 .setIssuedAt(issuedAt) // 토큰 발급 시각 설정
-                .setExpiration(new Date(now + 1800000)) // 토큰 만료 시간 설정 (30분)
+                .setExpiration(new Date(now + 180000000)) // 토큰 만료 시간 설정 (3000분)
                 .signWith(key, SignatureAlgorithm.HS256) // 서명 알고리즘 설정
                 .compact(); // 토큰 생성
 
