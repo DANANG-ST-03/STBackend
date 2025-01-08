@@ -34,7 +34,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
 //                .cors()
-//                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 명시
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 명시
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement((sessionManagement) ->
                     sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -63,7 +63,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("*"); // 모든 출처 허용
-        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
+        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용 => H
         configuration.addAllowedHeader("*"); // 모든 헤더 허용
         configuration.setAllowCredentials(false); // 쿠키 허용 여부
 

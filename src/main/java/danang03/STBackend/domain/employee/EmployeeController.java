@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/employee")
 public class EmployeeController {
+    private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);
     private final EmployeeService employeeService;
 
     @Autowired
