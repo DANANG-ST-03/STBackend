@@ -55,6 +55,16 @@ public class EmployeeController {
         return ResponseEntity.ok(globalResponse);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<GlobalResponse> getOneEmployee(@PathVariable Long id) {
+        EmployeeResponse employee = employeeService.getEmployee(id);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("get Employees id " + id + " success")
+                .data(employee).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
     @GetMapping
     public ResponseEntity<GlobalResponse> getEmployeesByPage(
             @RequestParam(defaultValue = "0") int page,

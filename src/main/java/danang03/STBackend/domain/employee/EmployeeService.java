@@ -37,6 +37,22 @@ public class EmployeeService {
         return employee.getId();
     }
 
+    public EmployeeResponse getEmployee(Long id) {
+        Employee employee = employeeRepository.findById(id).orElse(null);
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee with id " + id + " does not exist");
+        }
+        return new EmployeeResponse(
+                employee.getId(),
+                employee.getName(),
+                employee.getEmail(),
+                employee.getContact(),
+                employee.getSkills(),
+                employee.getJoiningDate(),
+                employee.getRole()
+        );
+    }
+
     public Page<EmployeeResponse> getEmployees(Pageable pageable) {
         return employeeRepository.findAll(pageable)
                 .map(employee -> new EmployeeResponse(
