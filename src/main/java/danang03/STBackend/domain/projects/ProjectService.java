@@ -2,6 +2,7 @@ package danang03.STBackend.domain.projects;
 
 import danang03.STBackend.domain.employee.Employee;
 import danang03.STBackend.domain.employee.EmployeeRepository;
+import danang03.STBackend.domain.projects.EmployeeProject.Role;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
@@ -90,7 +91,7 @@ public class ProjectService {
             EmployeeProject employeeProject = EmployeeProject.builder()
                     .project(project)
                     .employee(employee)
-                    .role(request.getRole())
+                    .role(Role.valueOf(request.getRole()))
                     .contribution(request.getContribution())
                     .build();
 
