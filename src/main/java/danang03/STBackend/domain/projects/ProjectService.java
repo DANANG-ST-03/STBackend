@@ -100,4 +100,24 @@ public class ProjectService {
 
         return employeeProjectIds;
     }
+
+    @Transactional
+    public void removeEmployeesFromProject(Long projectId, List<Long> employeeIds) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new IllegalArgumentException("Project with id " + projectId + " not found");
+        }
+        for (Long employeeId : employeeIds) {
+            if (!employeeRepository.existsById(employeeId)) {
+                throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
+            }
+        }
+
+        List<EmployeeProject> employeeProjects = employeeProjectRepository.findByProjectIdAndEmployeeIdIn(projectId, employeeIds);
+
+        if (employeeProjects.size() != employeeIds.size()) {
+            throw new IllegalArgumentException("Some EmployeeProjects not found");
+        }
+
+        employeeProjectRepository.deleteAll(employeeProjects);
+    }
 }

@@ -112,4 +112,17 @@ public class ProjectController {
                 .data(responses).build();
         return ResponseEntity.ok(globalResponse);
     }
+
+    @DeleteMapping("/{projectId}/employee")
+    public ResponseEntity<GlobalResponse> removeEmployeesFromProject(
+            @PathVariable Long projectId,
+            @RequestParam List<Long> employeeIds) {
+
+        projectService.removeEmployeesFromProject(projectId, employeeIds);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("Employee removed from project successfully")
+                .data(null).build();
+        return ResponseEntity.ok(globalResponse);
+    }
 }
