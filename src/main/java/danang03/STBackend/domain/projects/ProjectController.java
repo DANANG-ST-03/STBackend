@@ -107,7 +107,7 @@ public class ProjectController {
         }
 
         GlobalResponse globalResponse = GlobalResponse.builder()
-                .status(201)
+                .status(200)
                 .message("Employee assigned to project successfully")
                 .data(responses).build();
         return ResponseEntity.ok(globalResponse);
