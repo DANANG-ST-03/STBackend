@@ -5,7 +5,9 @@ import danang03.STBackend.domain.employee.EmployeeRepository;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
-import danang03.STBackend.domain.projects.dto.EmployeeProjectAddRequest;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentRequest;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,23 +76,28 @@ public class ProjectService {
     }
 
 
-    public Long assignEmployeeToProject(EmployeeProjectAddRequest request) {
-        // 직원과 프로젝트를 데이터베이스에서 조회
-        Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
-
-        Project project = projectRepository.findById(request.getProjectId())
+    @Transactional
+    public List<Long> assignEmployeesToProject(Long projectId, List<EmployeeProjectAssignmentRequest> requests) {
+        Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
-        // Employee_Project 엔티티 생성 및 저장
-        EmployeeProject employeeProject = EmployeeProject.builder()
-                .employee(employee)
-                .project(project)
-                .role(request.getRole())
-                .contribution(request.getContribution())
-                .build();
+        List<Long> employeeProjectIds = new ArrayList<>();
 
-        employeeProjectRepository.save(employeeProject);
-        return employeeProject.getId();
+        for (EmployeeProjectAssignmentRequest request : requests) {
+            Employee employee = employeeRepository.findById(request.getEmployeeId())
+                    .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+
+            EmployeeProject employeeProject = EmployeeProject.builder()
+                    .project(project)
+                    .employee(employee)
+                    .role(request.getRole())
+                    .contribution(request.getContribution())
+                    .build();
+
+            EmployeeProject savedEmployeeProject = employeeProjectRepository.save(employeeProject);
+            employeeProjectIds.add(savedEmployeeProject.getId());
+        }
+
+        return employeeProjectIds;
     }
 }

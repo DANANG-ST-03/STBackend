@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class EmployeeProjectAddResponse {
+public class EmployeeProjectAssignmentResponse {
     public Long employeeProjectId;
 }

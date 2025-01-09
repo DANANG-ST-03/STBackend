@@ -34,12 +34,12 @@ public class EmployeeProject {
     private Project project;
 
     @Enumerated(EnumType.STRING)
-    private String role;
+    private Role role;
 
     @Lob
     private String contribution;
 
-//    public enum Role {
-//        MANAGER, DEVELOPER, DESIGNER
-//    }
+    public enum Role {
+        TEAM_LEADER, DESIGNER, FE_DEVELOPER, BE_DEVELOPER
+    }
 }
