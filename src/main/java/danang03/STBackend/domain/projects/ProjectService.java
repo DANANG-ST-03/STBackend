@@ -88,6 +88,12 @@ public class ProjectService {
             Employee employee = employeeRepository.findById(request.getEmployeeId())
                     .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
 
+            // 이미 할당된 직원인지 확인
+            boolean exists = employeeProjectRepository.existsByProjectIdAndEmployeeId(projectId, request.getEmployeeId());
+            if (exists) {
+                continue;
+            }
+
             EmployeeProject employeeProject = EmployeeProject.builder()
                     .project(project)
                     .employee(employee)
