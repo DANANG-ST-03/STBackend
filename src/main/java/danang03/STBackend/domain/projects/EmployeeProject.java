@@ -1,8 +1,6 @@
-package danang03.STBackend.domain.relation;
+package danang03.STBackend.domain.projects;
 
 import danang03.STBackend.domain.employee.Employee;
-import danang03.STBackend.domain.member.Member;
-import danang03.STBackend.domain.projects.Project;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -36,12 +34,12 @@ public class EmployeeProject {
     private Project project;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private String role;
 
     @Lob
     private String contribution;
 
-    public enum Role {
-        MANAGER, DEVELOPER, DESIGNER
-    }
+//    public enum Role {
+//        MANAGER, DEVELOPER, DESIGNER
+//    }
 }

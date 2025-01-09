@@ -1,10 +1,12 @@
 package danang03.STBackend.domain.projects;
 
+import danang03.STBackend.domain.projects.dto.EmployeeProjectAddResponse;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateResponse;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectAddRequest;
 import danang03.STBackend.dto.GlobalResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +87,19 @@ public class ProjectController {
                 .message("deleted project successfully")
                 .data(null).build();
         log.info("Delete project successfully");
+        return ResponseEntity.ok(globalResponse);
+    }
+
+
+    // 프로젝트에 직원을 배정
+    @PostMapping("/project/member")
+    public ResponseEntity<GlobalResponse> assignEmployeeToProject(@RequestBody EmployeeProjectAddRequest request) {
+        Long employeeProjectId = projectService.assignEmployeeToProject(request);
+        EmployeeProjectAddResponse response = new EmployeeProjectAddResponse(employeeProjectId);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(201)
+                .message("Employee assigned to project successfully")
+                .data(response).build();
         return ResponseEntity.ok(globalResponse);
     }
 }

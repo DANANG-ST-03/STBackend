@@ -1,11 +1,11 @@
 package danang03.STBackend.domain.projects;
 
+import danang03.STBackend.domain.employee.Employee;
+import danang03.STBackend.domain.employee.EmployeeRepository;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
-import danang03.STBackend.domain.projects.dto.ProjectUpdateResponse;
-import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectService {
     private final ProjectRepository projectRepository;
+    private final EmployeeRepository employeeRepository;
+    private final EmployeeProjectRepository employeeProjectRepository;
 
     @Autowired
-    public ProjectService(ProjectRepository projectRepository) {
+    public ProjectService(ProjectRepository projectRepository, EmployeeRepository employeeRepository, EmployeeProjectRepository employeeProjectRepository) {
         this.projectRepository = projectRepository;
+        this.employeeRepository = employeeRepository;
+        this.employeeProjectRepository = employeeProjectRepository;
     }
 
     public Long addProject(ProjectAddRequest request) {
@@ -67,5 +71,26 @@ public class ProjectService {
             throw new IllegalArgumentException("Project with id " + id + " not found");
         }
         projectRepository.deleteById(id);
+    }
+
+
+    public Long assignEmployeeToProject(EmployeeProjectAddRequest request) {
+        // 직원과 프로젝트를 데이터베이스에서 조회
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
+                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+
+        Project project = projectRepository.findById(request.getProjectId())
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
+        // Employee_Project 엔티티 생성 및 저장
+        EmployeeProject employeeProject = EmployeeProject.builder()
+                .employee(employee)
+                .project(project)
+                .role(request.getRole())
+                .contribution(request.getContribution())
+                .build();
+
+        employeeProjectRepository.save(employeeProject);
+        return employeeProject.getId();
     }
 }
