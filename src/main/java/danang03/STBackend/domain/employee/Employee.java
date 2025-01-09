@@ -1,11 +1,16 @@
 package danang03.STBackend.domain.employee;
 
+import danang03.STBackend.domain.projects.EmployeeProject;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +35,10 @@ public class Employee {
     private String skills;
     private LocalDate joiningDate;
     private String role;
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EmployeeProject> employeeProjects = new ArrayList<>();
+
 
     // 업데이트를 위한 메서드
     public void update(String name, String email, String contact, String skills, LocalDate joiningDate, String role) {

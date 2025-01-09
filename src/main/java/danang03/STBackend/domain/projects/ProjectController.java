@@ -1,11 +1,15 @@
 package danang03.STBackend.domain.projects;
 
+import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentResponse;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateResponse;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentRequest;
 import danang03.STBackend.dto.GlobalResponse;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +89,40 @@ public class ProjectController {
                 .message("deleted project successfully")
                 .data(null).build();
         log.info("Delete project successfully");
+        return ResponseEntity.ok(globalResponse);
+    }
+
+
+    // 프로젝트에 직원을 배정
+    @PostMapping("{projectId}/employee")
+    public ResponseEntity<GlobalResponse> assignEmployeesToProject(
+            @PathVariable Long projectId,
+            @RequestBody List<EmployeeProjectAssignmentRequest> request) {
+
+        // 서비스 호출
+        List<Long> employeeProjectIds = projectService.assignEmployeesToProject(projectId, request);
+        List<EmployeeProjectAssignmentResponse> responses = new ArrayList<>();
+        for (Long id : employeeProjectIds) {
+            responses.add(new EmployeeProjectAssignmentResponse(id));
+        }
+
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("Employee assigned to project successfully")
+                .data(responses).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
+    @DeleteMapping("/{projectId}/employee")
+    public ResponseEntity<GlobalResponse> removeEmployeesFromProject(
+            @PathVariable Long projectId,
+            @RequestParam List<Long> employeeIds) {
+
+        projectService.removeEmployeesFromProject(projectId, employeeIds);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("Employee removed from project successfully")
+                .data(null).build();
         return ResponseEntity.ok(globalResponse);
     }
 }

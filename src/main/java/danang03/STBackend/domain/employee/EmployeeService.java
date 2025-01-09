@@ -30,6 +30,7 @@ public class EmployeeService {
                 .email(request.getEmail())
                 .contact(request.getContact())
                 .skills(request.getSkills())
+                .role(request.getRole())
                 .joiningDate(request.getJoiningDate()).build();
         employeeRepository.save(employee);
 
