@@ -1,12 +1,9 @@
 package danang03.STBackend.domain.geminiAPI;
 
 
-import danang03.STBackend.domain.employee.Employee;
 import danang03.STBackend.domain.employee.EmployeeService;
 import danang03.STBackend.domain.employee.dto.EmployeeResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +40,7 @@ public class GeminiService {
     public String generateEmployeeReport(String promptText) {
         GeminiRequest request = new GeminiRequest(promptText);
         // 전체 Employee DB 조회
-        List<EmployeeResponse> employees = employeeService.getEmployees(Pageable.unpaged()).getContent();
+        List<EmployeeResponse> employees = employeeService.getEmployeesByPage(Pageable.unpaged()).getContent();
 
         // 직원 정보를 요청 본문으로 변환
         StringBuilder promptBuilder = new StringBuilder("Generate a report about the following employees:\n");

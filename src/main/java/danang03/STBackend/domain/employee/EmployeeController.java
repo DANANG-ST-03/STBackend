@@ -72,7 +72,7 @@ public class EmployeeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Pageable pageable) {
-        Page<EmployeeResponse> employees = employeeService.getEmployees(PageRequest.of(page, size));
+        Page<EmployeeResponse> employees = employeeService.getEmployeesByPage(PageRequest.of(page, size));
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("get Employees success")
@@ -83,9 +83,9 @@ public class EmployeeController {
     @PutMapping("{id}")
     public ResponseEntity<GlobalResponse> updateEmployee(@PathVariable Long id, @RequestBody UpdateEmployeeRequest request) {
         employeeService.updateEmployee(id, request);
-        log.info("Update employee with id {}", id);
+//        log.info("Update employee with id {}", id);
         UpdateEmployeeResponse updateEmployeeResponse = new UpdateEmployeeResponse(id);
-        log.info("Update employee response: {}", updateEmployeeResponse);
+//        log.info("Update employee response: {}", updateEmployeeResponse);
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("updated employee successfully")

@@ -6,7 +6,9 @@ import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import danang03.STBackend.domain.image.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,8 +60,14 @@ public class EmployeeService {
                 .imageUrl(employee.getImageUrl()).build();
     }
 
-    public Page<EmployeeResponse> getEmployees(Pageable pageable) {
-        return employeeRepository.findAll(pageable)
+    public Page<EmployeeResponse> getEmployeesByPage(Pageable pageable) {
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "joiningDate") // 최신순 정렬
+        );
+
+        return employeeRepository.findAll(sortedPageable)
                 .map(employee -> new EmployeeResponse(
                         employee.getId(),
                         employee.getName(),
