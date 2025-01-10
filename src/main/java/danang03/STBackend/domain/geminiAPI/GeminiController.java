@@ -14,21 +14,9 @@ public class GeminiController {
         this.geminiService = geminiService;
     }
 
-    @PostMapping("/generate-sql")
-    public ResponseEntity<String> generateSql(@RequestBody String prompt) {
-        String res;
-        res = geminiService.generateResponse(prompt);
-        return ResponseEntity.ok(res);
-        //String sql;
-        //sql = geminiService.generateSql(prompt);
-        //return ResponseEntity.ok(sql);
-    }
-
-
-
-    @PostMapping("/generate-report")
-    public ResponseEntity<String> generateEmployeeReport(@RequestBody String prompt) {
-        String response = geminiService.generateEmployeeReport(prompt);
+    @PostMapping("/process-query")
+    public ResponseEntity<String> processQuery(@RequestBody String naturalLanguagePrompt) {
+        String response = geminiService.processNaturalLanguageQuery(naturalLanguagePrompt);
         return ResponseEntity.ok(response);
     }
 }
