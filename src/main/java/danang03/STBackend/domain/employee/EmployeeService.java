@@ -1,6 +1,5 @@
 package danang03.STBackend.domain.employee;
 
-import danang03.STBackend.config.auth.dto.SigninRequest;
 import danang03.STBackend.domain.employee.dto.AddEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.EmployeeResponse;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
@@ -106,7 +105,7 @@ public class EmployeeService {
      ****************/
 
     @Transactional
-    public String updateEmployeeImage(Long employeeId, MultipartFile imageFile) {
+    public String uploadEmployeeImage(Long employeeId, MultipartFile imageFile) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new IllegalArgumentException("Employee id " + employeeId + " not found"));
 

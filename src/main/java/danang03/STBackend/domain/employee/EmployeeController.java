@@ -9,8 +9,6 @@ import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeResponse;
 import danang03.STBackend.domain.image.S3Service;
 import danang03.STBackend.dto.GlobalResponse;
-import lombok.extern.java.Log;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -117,11 +114,10 @@ public class EmployeeController {
 
     @PostMapping("/{id}/image")
     public ResponseEntity<GlobalResponse> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile imageFile) {
-        System.out.println("aaaaaaaaaaaaaaa");
         validateImgage(imageFile);
-        String uploadedImageUrl = employeeService.updateEmployeeImage(id, imageFile);
 
-        employeeService.updateEmployeeImage(id, imageFile);
+        String uploadedImageUrl = employeeService.uploadEmployeeImage(id, imageFile);
+
         GlobalResponse response = GlobalResponse.builder()
                 .status(200)
                 .message("Uploaded image successfully")
