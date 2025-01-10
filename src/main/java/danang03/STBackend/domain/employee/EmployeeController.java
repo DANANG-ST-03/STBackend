@@ -1,10 +1,13 @@
 package danang03.STBackend.domain.employee;
 
+import static danang03.STBackend.domain.image.ImageValidation.validateImgage;
+
 import danang03.STBackend.domain.employee.dto.AddEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.AddEmployeeResponse;
 import danang03.STBackend.domain.employee.dto.EmployeeResponse;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeResponse;
+import danang03.STBackend.domain.image.S3Service;
 import danang03.STBackend.dto.GlobalResponse;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -33,15 +37,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmployeeController {
     private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);
     private final EmployeeService employeeService;
+    private final S3Service s3Service;
 
 
     @Autowired
-    public EmployeeController(EmployeeService employeeService) {
+    public EmployeeController(EmployeeService employeeService, S3Service s3Service) {
         this.employeeService = employeeService;
+        this.s3Service = s3Service;
     }
 
     @PostMapping
-    @CrossOrigin(origins = "http://localhost:5173")
     public ResponseEntity<GlobalResponse> addEmployee(@RequestBody AddEmployeeRequest request) {
         Long employeeId = employeeService.createEmployee(request);
         log.info("Add employee with id {}", employeeId);
@@ -101,5 +106,39 @@ public class EmployeeController {
                 .message("deleted employee successfully")
                 .data(null).build();
         return ResponseEntity.ok(globalResponse);
+    }
+
+
+
+
+    /****************
+     **** image  ****
+     ****************/
+
+    @PostMapping("/{id}/image")
+    public ResponseEntity<GlobalResponse> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile imageFile) {
+        System.out.println("aaaaaaaaaaaaaaa");
+        validateImgage(imageFile);
+        String uploadedImageUrl = employeeService.updateEmployeeImage(id, imageFile);
+
+        employeeService.updateEmployeeImage(id, imageFile);
+        GlobalResponse response = GlobalResponse.builder()
+                .status(200)
+                .message("Uploaded image successfully")
+                .data(uploadedImageUrl)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+
+    @DeleteMapping("/{id}/image")
+    public ResponseEntity<GlobalResponse> deleteEmployeeImage(@PathVariable Long id) {
+        employeeService.deleteEmployeeImage(id);
+
+        GlobalResponse response = GlobalResponse.builder()
+                .status(200)
+                .message("Deleted image successfully")
+                .build();
+        return ResponseEntity.ok(response);
     }
 }

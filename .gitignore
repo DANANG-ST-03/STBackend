@@ -38,3 +38,7 @@ out/
 
 ### auh ###
 application-oauth.properties
+
+
+### api key ###
+/src/main/resources/secret.properties
