@@ -28,6 +28,8 @@ public class Employee {
 
     @Column(nullable = false)
     private String name;
+    private String first_name;
+    private String last_name;
 
     @Column(nullable = false, unique = true)
     private String email;
