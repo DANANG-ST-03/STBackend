@@ -2,10 +2,12 @@ package danang03.STBackend.domain.projects;
 
 import danang03.STBackend.domain.employee.Employee;
 import danang03.STBackend.domain.employee.EmployeeRepository;
+import danang03.STBackend.domain.employee.dto.EmployeeResponse;
 import danang03.STBackend.domain.projects.EmployeeProject.JoinStatus;
 import danang03.STBackend.domain.projects.EmployeeProject.Role;
 import danang03.STBackend.domain.employee.dto.EmployeeResponseForProjectDetail;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeJoinStatusRequest;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
@@ -59,24 +61,35 @@ public class ProjectService {
 
 
     public ProjectDetailResponse getProjectDetail(Long projectId) {
+        // projectInfo
         ProjectResponse projectResponse = getProject(projectId);
+
+        // employeesInfo
         List<EmployeeProject> employeeProjects = employeeProjectRepository.findByProjectId(projectId);
         List<EmployeeResponseForProjectDetail> employeeResponses = employeeProjects.stream()
                 .map(employeeProject -> {
                     Employee employee = employeeProject.getEmployee();
-                    return EmployeeResponseForProjectDetail.builder()
+
+                    EmployeeResponse employeeResponse = EmployeeResponse.builder()
                             .id(employee.getId())
                             .name(employee.getName())
                             .email(employee.getEmail())
                             .contact(employee.getContact())
                             .skills(employee.getSkills())
                             .joiningDate(employee.getJoiningDate())
-                            .roleOfEmployee(employee.getRole())
-                            .imageUrl(employee.getImageUrl())
+                            .role(employee.getRole())
+                            .imageUrl(employee.getImageUrl()).build();
+
+                    EmployeeProjectResponse employeeProjectResponse = EmployeeProjectResponse.builder()
                             .roleInProject(employeeProject.getRole())
-                            .contribution(employeeProject.getContribution()).build();
-                })
-                .toList();
+                            .contribution(employeeProject.getContribution())
+                            .joinDate(employeeProject.getJoinDate())
+                            .exitDate(employeeProject.getExitDate())
+                            .joinStatus(employeeProject.getJoinStatus()).build();
+
+                    return new EmployeeResponseForProjectDetail(employeeResponse, employeeProjectResponse);
+                }).toList();
+
         return new ProjectDetailResponse(projectResponse, employeeResponses);
     }
 
