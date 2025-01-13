@@ -94,7 +94,10 @@ public class EmployeeService {
         Pageable sortedPageable = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "joiningDate") // 최신순 정렬
+                Sort.by(
+                        Sort.Order.desc("joiningDate"), // startDate 기준 내림차순, null은 마지막
+                        Sort.Order.asc("id")
+                )
         );
 
         return employeeRepository.findAll(sortedPageable)

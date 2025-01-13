@@ -83,7 +83,10 @@ public class ProjectService {
         Pageable sortedPageable = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "startDate") // 최신순 정렬
+                Sort.by(
+                        Sort.Order.desc("startDate"), // startDate 기준 내림차순
+                        Sort.Order.asc("id")                     // id 기준 오름차순
+                )
         );
 
         return projectRepository.findAll(sortedPageable)
