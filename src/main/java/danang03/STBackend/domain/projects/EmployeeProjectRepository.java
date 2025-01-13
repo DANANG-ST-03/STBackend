@@ -10,4 +10,5 @@ public interface EmployeeProjectRepository extends JpaRepository<EmployeeProject
     boolean existsByProjectIdAndEmployeeId(Long projectId, Long employeeId);
 
     boolean existsByProjectId(Long id);
+    boolean existsByEmployeeId(Long id);
 }

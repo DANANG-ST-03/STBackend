@@ -4,6 +4,7 @@ import danang03.STBackend.domain.employee.dto.AddEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.EmployeeResponse;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import danang03.STBackend.domain.image.S3Service;
+import danang03.STBackend.domain.projects.EmployeeProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,12 +17,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
+    private final EmployeeProjectRepository employeeProjectRepository;
     private final S3Service s3Service;
 
 
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository, S3Service s3Service) {
+    public EmployeeService(EmployeeRepository employeeRepository, EmployeeProjectRepository employeeProjectRepository, S3Service s3Service) {
         this.employeeRepository = employeeRepository;
+        this.employeeProjectRepository = employeeProjectRepository;
         this.s3Service = s3Service;
     }
 
@@ -101,6 +104,12 @@ public class EmployeeService {
     public void deleteEmployee(Long id) {
         if (!employeeRepository.existsById(id)) {
             throw new IllegalArgumentException("employee with id " + id + " not found");
+        }
+
+        // check employee in project
+        boolean hasProjects = employeeProjectRepository.existsByEmployeeId(id);
+        if (hasProjects) {
+            throw new IllegalStateException("Employee with id " + id + " cannot be deleted because it has associated projects.");
         }
         employeeRepository.deleteById(id);
     }
