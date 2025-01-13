@@ -40,6 +40,11 @@ public class EmployeeProject {
     private String contribution;
 
     public enum Role {
-        TEAM_LEADER, DESIGNER, FE_DEVELOPER, BE_DEVELOPER
+        TEAM_LEADER,
+        DESIGNER,
+        FE_DEVELOPER,
+        BE_DEVELOPER,
+        AI_ENGINEER,
+        TESTER
     }
 }
