@@ -35,6 +35,7 @@ public class Employee {
     private String skills;
     private LocalDate joiningDate;
     private String role;
+    private String imageUrl;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EmployeeProject> employeeProjects = new ArrayList<>();
@@ -48,5 +49,9 @@ public class Employee {
         this.skills = skills != null ? skills : this.skills;
         this.joiningDate = joiningDate != null ? joiningDate : this.joiningDate;
         this.role = role != null ? role : this.role;
+    }
+
+    public void updateImage(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
