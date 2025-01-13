@@ -73,6 +73,12 @@ public class ProjectService {
         if (!projectRepository.existsById(id)) {
             throw new IllegalArgumentException("Project with id " + id + " not found");
         }
+
+        // check employee in project
+        boolean hasEmployees = employeeProjectRepository.existsByProjectId(id);
+        if (hasEmployees) {
+            throw new IllegalStateException("Project with id " + id + " cannot be deleted because it has associated employees.");
+        }
         projectRepository.deleteById(id);
     }
 
