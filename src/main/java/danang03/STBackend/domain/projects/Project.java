@@ -41,7 +41,7 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "project")
     private List<EmployeeProject> employeeProjects = new ArrayList<>();
 
     // 업데이트를 위한 메서드
