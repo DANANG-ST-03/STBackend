@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -28,15 +29,20 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @Column(nullable = false)
     private String name;
 
+    @Setter
     private String description;
 
+    @Setter
     private LocalDate startDate;
 
+    @Setter
     private LocalDate endDate;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 

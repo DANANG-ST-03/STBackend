@@ -9,6 +9,7 @@ import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentRequest;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,15 +95,24 @@ public class ProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Project with id " + id + "not found"));
 
-        // 업데이트 메서드 호출
-        project.update(
-                request.getName(),
-                request.getDescription(),
-                request.getStartDate(),
-                request.getEndDate(),
-                request.getStatus()
-        );
+        project.setName(request.getName());
+        project.setDescription(request.getDescription());
+
+
+        // change status
+        ProjectStatus previousStatus = project.getStatus();
+        project.setStatus(request.getStatus());
+
+        if (previousStatus == ProjectStatus.PENDING && request.getStatus() == ProjectStatus.WORKING) {
+            project.setStartDate(LocalDate.now());
+        }
+        else if (previousStatus == ProjectStatus.WORKING && request.getStatus() == ProjectStatus.COMPLETE) {
+            project.setEndDate(LocalDate.now());
+        }
+
+        projectRepository.save(project);
     }
+
 
     public void deleteProject(Long id) {
         if (!projectRepository.existsById(id)) {
