@@ -2,6 +2,7 @@ package danang03.STBackend.domain.geminiAPI;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -85,6 +86,7 @@ public class GeminiService {
             return results;
         } catch (Exception e) {
             throw new RuntimeException("Failed to find relevant data. Please check your input.");
+
         }
     }
 

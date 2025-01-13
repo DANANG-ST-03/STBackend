@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@Builder
 public class EmployeeResponse {
     private Long id;
     private String name;
@@ -14,4 +15,5 @@ public class EmployeeResponse {
     private String skills;
     private LocalDate joiningDate;
     private String role;
+    private String imageUrl;
 }
