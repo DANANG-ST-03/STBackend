@@ -4,6 +4,7 @@ import static danang03.STBackend.domain.image.ImageValidation.validateImgage;
 
 import danang03.STBackend.domain.employee.dto.AddEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.AddEmployeeResponse;
+import danang03.STBackend.domain.employee.dto.EmployeeDetailResponse;
 import danang03.STBackend.domain.employee.dto.EmployeeResponse;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeResponse;
@@ -67,6 +68,16 @@ public class EmployeeController {
         return ResponseEntity.ok(globalResponse);
     }
 
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<GlobalResponse> getEmployeeDetail(@PathVariable Long id) {
+        EmployeeDetailResponse employeeDetail = employeeService.getEmployeeDetail(id);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("get Employees id " + id + " detail success")
+                .data(employeeDetail).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
     @GetMapping
     public ResponseEntity<GlobalResponse> getEmployeesByPage(
             @RequestParam(defaultValue = "0") int page,
@@ -104,7 +115,6 @@ public class EmployeeController {
                 .data(null).build();
         return ResponseEntity.ok(globalResponse);
     }
-
 
 
 

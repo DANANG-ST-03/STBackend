@@ -36,7 +36,6 @@ public class EmployeeProject {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Lob
     private String contribution;
 
     public enum Role {

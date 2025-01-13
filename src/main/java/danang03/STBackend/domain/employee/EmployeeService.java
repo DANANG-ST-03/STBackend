@@ -1,10 +1,16 @@
 package danang03.STBackend.domain.employee;
 
 import danang03.STBackend.domain.employee.dto.AddEmployeeRequest;
+import danang03.STBackend.domain.employee.dto.EmployeeDetailResponse;
 import danang03.STBackend.domain.employee.dto.EmployeeResponse;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import danang03.STBackend.domain.image.S3Service;
+import danang03.STBackend.domain.projects.EmployeeProject;
 import danang03.STBackend.domain.projects.EmployeeProjectRepository;
+import danang03.STBackend.domain.projects.Project;
+import danang03.STBackend.domain.projects.dto.ProjectResponse;
+import java.util.List;
+import org.aspectj.weaver.ast.Literal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -61,6 +67,25 @@ public class EmployeeService {
                 .joiningDate(employee.getJoiningDate())
                 .role(employee.getRole())
                 .imageUrl(employee.getImageUrl()).build();
+    }
+
+    public EmployeeDetailResponse getEmployeeDetail(Long employeeId) {
+        EmployeeResponse employeeResponse = getEmployee(employeeId);
+        List<EmployeeProject> employeeProjects = employeeProjectRepository.findByEmployeeId(employeeId);
+        List<ProjectResponse> projectResponses = employeeProjects.stream()
+                .map(employeeProject -> {
+                    Project project = employeeProject.getProject();
+                        return new ProjectResponse(
+                                project.getId(),
+                                project.getName(),
+                                project.getDescription(),
+                                project.getStartDate(),
+                                project.getEndDate(),
+                                project.getStatus()
+                        );
+                })
+                .toList();
+        return new EmployeeDetailResponse(employeeResponse, projectResponses);
     }
 
     public Page<EmployeeResponse> getEmployeesByPage(Pageable pageable) {
