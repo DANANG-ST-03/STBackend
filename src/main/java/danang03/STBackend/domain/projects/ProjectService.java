@@ -31,15 +31,10 @@ public class ProjectService {
     }
 
     public Long addProject(ProjectAddRequest request) {
-        Project project = Project.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
-                .status(request.getStatus()).build();
-         projectRepository.save(project);
+        Project project = new Project(request.getName(), request.getDescription(), request.getStatus());
+        projectRepository.save(project);
 
-         return project.getId();
+        return project.getId();
     }
 
 

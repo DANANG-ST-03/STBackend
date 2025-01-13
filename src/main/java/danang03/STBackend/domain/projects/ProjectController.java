@@ -42,8 +42,6 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<GlobalResponse> addProject(@RequestBody ProjectAddRequest request) {
-        System.out.println("Project Name: " + request.getName());
-        System.out.println("Project Status: " + request.getStatus()); // Enum 값 출력
         Long projectId = projectService.addProject(request);
         ProjectAddResponse response = new ProjectAddResponse(projectId);
         GlobalResponse globalResponse = GlobalResponse.builder()
