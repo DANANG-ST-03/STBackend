@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -71,7 +70,7 @@ public class ProjectController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Pageable pageable) {
-        Page<ProjectResponse> projects = projectService.getProjects(PageRequest.of(page, size));
+        Page<ProjectResponse> projects = projectService.getProjectsByPage(PageRequest.of(page, size));
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("get projects success")

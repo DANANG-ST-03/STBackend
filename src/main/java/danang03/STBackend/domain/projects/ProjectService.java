@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,8 +79,14 @@ public class ProjectService {
     }
 
 
-    public Page<ProjectResponse> getProjects(Pageable pageable) {
-        return projectRepository.findAll(pageable)
+    public Page<ProjectResponse> getProjectsByPage(Pageable pageable) {
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "startDate") // 최신순 정렬
+        );
+
+        return projectRepository.findAll(sortedPageable)
                 .map(project -> new ProjectResponse(
                         project.getId(),
                         project.getName(),
