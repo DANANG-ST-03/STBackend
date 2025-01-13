@@ -61,8 +61,8 @@ dependencies {
 	implementation 'software.amazon.awssdk:ssm:2.20.5'
 
 	// aws parameter store
-	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameterstore-config:3.0.1'
-	implementation 'io.awspring.cloud:spring-cloud-aws-starter:2.4.3'
+//	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameterstore-config:3.0.1'
+//	implementation 'io.awspring.cloud:spring-cloud-aws-starter:2.4.3'
 }
 
 tasks.named('test') {
