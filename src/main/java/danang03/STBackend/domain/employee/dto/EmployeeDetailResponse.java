@@ -9,5 +9,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class EmployeeDetailResponse {
     private EmployeeResponse employeeInfo;
-    private List<ProjectResponseForEmployeeDetail> projects;
+    private List<ProjectResponseForEmployeeDetail> projectsInfo;
 }
