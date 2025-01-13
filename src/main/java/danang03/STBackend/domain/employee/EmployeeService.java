@@ -9,6 +9,7 @@ import danang03.STBackend.domain.projects.EmployeeProject;
 import danang03.STBackend.domain.projects.EmployeeProjectRepository;
 import danang03.STBackend.domain.projects.Project;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
+import danang03.STBackend.domain.projects.dto.ProjectResponseForEmployeeDetail;
 import java.util.List;
 import org.aspectj.weaver.ast.Literal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,17 +73,18 @@ public class EmployeeService {
     public EmployeeDetailResponse getEmployeeDetail(Long employeeId) {
         EmployeeResponse employeeResponse = getEmployee(employeeId);
         List<EmployeeProject> employeeProjects = employeeProjectRepository.findByEmployeeId(employeeId);
-        List<ProjectResponse> projectResponses = employeeProjects.stream()
+        List<ProjectResponseForEmployeeDetail> projectResponses = employeeProjects.stream()
                 .map(employeeProject -> {
                     Project project = employeeProject.getProject();
-                        return new ProjectResponse(
-                                project.getId(),
-                                project.getName(),
-                                project.getDescription(),
-                                project.getStartDate(),
-                                project.getEndDate(),
-                                project.getStatus()
-                        );
+                        return ProjectResponseForEmployeeDetail.builder()
+                                .id(project.getId())
+                                .name(project.getName())
+                                .description(project.getDescription())
+                                .startDate(project.getStartDate())
+                                .endDate(project.getEndDate())
+                                .status(project.getStatus())
+                                .roleInProject(employeeProject.getRole())
+                                .contribution(employeeProject.getContribution()).build();
                 })
                 .toList();
         return new EmployeeDetailResponse(employeeResponse, projectResponses);

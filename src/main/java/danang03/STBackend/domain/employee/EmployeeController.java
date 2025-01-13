@@ -73,7 +73,7 @@ public class EmployeeController {
         EmployeeDetailResponse employeeDetail = employeeService.getEmployeeDetail(id);
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
-                .message("get Employees id " + id + " detail success")
+                .message("get Employee id " + id + " detail success")
                 .data(employeeDetail).build();
         return ResponseEntity.ok(globalResponse);
     }

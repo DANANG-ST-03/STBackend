@@ -3,6 +3,7 @@ package danang03.STBackend.domain.projects;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentResponse;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddResponse;
+import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateResponse;
@@ -50,6 +51,18 @@ public class ProjectController {
                 .message("Project added successfully")
                 .data(response).build();
 
+        return ResponseEntity.ok(globalResponse);
+    }
+
+
+
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<GlobalResponse> getProjectDetail(@PathVariable Long id) {
+        ProjectDetailResponse projectDetail = projectService.getProjectDetail(id);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("get Project id " + id + " detail success")
+                .data(projectDetail).build();
         return ResponseEntity.ok(globalResponse);
     }
 

@@ -3,7 +3,9 @@ package danang03.STBackend.domain.projects;
 import danang03.STBackend.domain.employee.Employee;
 import danang03.STBackend.domain.employee.EmployeeRepository;
 import danang03.STBackend.domain.projects.EmployeeProject.Role;
+import danang03.STBackend.domain.employee.dto.EmployeeResponseForProjectDetail;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
+import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentRequest;
@@ -38,6 +40,44 @@ public class ProjectService {
          projectRepository.save(project);
 
          return project.getId();
+    }
+
+
+    public ProjectResponse getProject(Long id) {
+        Project project = projectRepository.findById(id).orElse(null);
+        if (project == null) {
+            throw new IllegalArgumentException("Project with id " + id + " does not exist");
+        }
+        return ProjectResponse.builder()
+                .id(project.getId())
+                .name(project.getName())
+                .description(project.getDescription())
+                .startDate(project.getStartDate())
+                .endDate(project.getEndDate())
+                .status(project.getStatus()).build();
+    }
+
+
+    public ProjectDetailResponse getProjectDetail(Long projectId) {
+        ProjectResponse projectResponse = getProject(projectId);
+        List<EmployeeProject> employeeProjects = employeeProjectRepository.findByProjectId(projectId);
+        List<EmployeeResponseForProjectDetail> employeeResponses = employeeProjects.stream()
+                .map(employeeProject -> {
+                    Employee employee = employeeProject.getEmployee();
+                    return EmployeeResponseForProjectDetail.builder()
+                            .id(employee.getId())
+                            .name(employee.getName())
+                            .email(employee.getEmail())
+                            .contact(employee.getContact())
+                            .skills(employee.getSkills())
+                            .joiningDate(employee.getJoiningDate())
+                            .roleOfEmployee(employee.getRole())
+                            .imageUrl(employee.getImageUrl())
+                            .roleInProject(employeeProject.getRole())
+                            .contribution(employeeProject.getContribution()).build();
+                })
+                .toList();
+        return new ProjectDetailResponse(projectResponse, employeeResponses);
     }
 
 
