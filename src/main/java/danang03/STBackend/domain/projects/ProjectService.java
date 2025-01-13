@@ -2,8 +2,10 @@ package danang03.STBackend.domain.projects;
 
 import danang03.STBackend.domain.employee.Employee;
 import danang03.STBackend.domain.employee.EmployeeRepository;
+import danang03.STBackend.domain.projects.EmployeeProject.JoinStatus;
 import danang03.STBackend.domain.projects.EmployeeProject.Role;
 import danang03.STBackend.domain.employee.dto.EmployeeResponseForProjectDetail;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeJoinStatusRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
@@ -156,18 +158,45 @@ public class ProjectService {
                 continue;
             }
 
-            EmployeeProject employeeProject = EmployeeProject.builder()
-                    .project(project)
-                    .employee(employee)
-                    .role(Role.valueOf(request.getRole()))
-                    .contribution(request.getContribution())
-                    .build();
+            EmployeeProject employeeProject = new EmployeeProject(
+                    employee,
+                    project,
+                    Role.valueOf(request.getRole()),
+                    request.getContribution()
+            );
 
             EmployeeProject savedEmployeeProject = employeeProjectRepository.save(employeeProject);
             employeeProjectIds.add(savedEmployeeProject.getId());
         }
 
         return employeeProjectIds;
+    }
+
+    public void changeEmployeeJoinStatus(Long projectId,
+                                         Long employeeId,
+                                         EmployeeProjectChangeJoinStatusRequest joinStatusRequest) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new IllegalArgumentException("Project with id " + projectId + " not found");
+        }
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
+        }
+        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId);
+
+        JoinStatus previousJoinStatus = employeeProject.getJoinStatus();
+        JoinStatus newJoinStatus = joinStatusRequest.getJoinStatus();
+
+        if (previousJoinStatus == JoinStatus.DOING && newJoinStatus == JoinStatus.EXITED) {
+            employeeProject.setJoinStatus(newJoinStatus);
+            employeeProject.setExitDate(LocalDate.now());
+        }
+        else if (previousJoinStatus == JoinStatus.EXITED && newJoinStatus == JoinStatus.DOING) {
+            employeeProject.setJoinStatus(newJoinStatus);
+            employeeProject.setExitDate(null);
+        }
+
+
+        employeeProjectRepository.save(employeeProject);
     }
 
     @Transactional
