@@ -7,6 +7,7 @@ import danang03.STBackend.domain.projects.EmployeeProject.JoinStatus;
 import danang03.STBackend.domain.projects.EmployeeProject.Role;
 import danang03.STBackend.domain.employee.dto.EmployeeResponseForProjectDetail;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeJoinStatusRequest;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeRoleRequest;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
@@ -211,6 +212,21 @@ public class ProjectService {
 
         employeeProjectRepository.save(employeeProject);
     }
+
+
+    public void changeEmployeeProjectRole(Long projectId, Long employeeId, EmployeeProjectChangeRoleRequest request) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new IllegalArgumentException("Project with id " + projectId + " not found");
+        }
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
+        }
+        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId);
+
+        employeeProject.setRole(request.getRole());
+        employeeProjectRepository.save(employeeProject);
+    }
+
 
     @Transactional
     public void removeEmployeesFromProject(Long projectId, List<Long> employeeIds) {

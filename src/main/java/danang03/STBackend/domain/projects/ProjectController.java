@@ -2,6 +2,7 @@ package danang03.STBackend.domain.projects;
 
 import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentResponse;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeJoinStatusRequest;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeRoleRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddResponse;
 import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
@@ -136,6 +137,20 @@ public class ProjectController {
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("Employee changed joinStatus to " + joinStatusRequest.getJoinStatus() + " successfully")
+                .data(null).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
+    @PutMapping("/{projectId}/employee/{employeeId}/role")
+    public ResponseEntity<GlobalResponse> changeEmployeeRole(
+            @PathVariable Long projectId,
+            @PathVariable Long employeeId,
+            @RequestBody EmployeeProjectChangeRoleRequest request
+    ) {
+        projectService.changeEmployeeProjectRole(projectId, employeeId, request);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("EmployeeRole changed to " + request.getRole().toString() + " successfully")
                 .data(null).build();
         return ResponseEntity.ok(globalResponse);
     }
