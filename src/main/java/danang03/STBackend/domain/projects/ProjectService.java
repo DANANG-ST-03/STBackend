@@ -226,7 +226,10 @@ public class ProjectService {
         if (!employeeRepository.existsById(employeeId)) {
             throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
         }
-        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId);
+        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId).orElse(null);
+        if (employeeProject == null) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " is not assigned for project with id " + projectId);
+        }
 
         employeeProject.setRole(request.getRole());
         employeeProjectRepository.save(employeeProject);
@@ -234,22 +237,25 @@ public class ProjectService {
 
 
     @Transactional
-    public void removeEmployeesFromProject(Long projectId, List<Long> employeeIds) {
+    public void removeEmployeesFromProject(Long projectId, Long employeeId) {
         if (!projectRepository.existsById(projectId)) {
             throw new IllegalArgumentException("Project with id " + projectId + " not found");
         }
-        for (Long employeeId : employeeIds) {
-            if (!employeeRepository.existsById(employeeId)) {
-                throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
-            }
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
         }
 
-        List<EmployeeProject> employeeProjects = employeeProjectRepository.findByProjectIdAndEmployeeIdIn(projectId, employeeIds);
-
-        if (employeeProjects.size() != employeeIds.size()) {
-            throw new IllegalArgumentException("Some EmployeeProjects not found");
+        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId).orElse(null);
+        if (employeeProject == null) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " is not assigned for project with id " + projectId);
         }
 
-        employeeProjectRepository.deleteAll(employeeProjects);
+        if (employeeProject.getJoinStatus() == JoinStatus.DOING) {
+            throw new IllegalStateException(
+                    "Only READY, EXITED status employee can be removed from project.");
+        }
+
+
+        employeeProjectRepository.delete(employeeProject);
     }
 }
