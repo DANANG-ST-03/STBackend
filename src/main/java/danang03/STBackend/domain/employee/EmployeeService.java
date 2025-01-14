@@ -1,8 +1,17 @@
 package danang03.STBackend.domain.employee;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfPage;
+import com.itextpdf.kernel.pdf.PdfReader;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.VerticalAlignment;
 import danang03.STBackend.domain.employee.dto.AddEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.EmployeeDetailResponse;
 import danang03.STBackend.domain.employee.dto.EmployeeResponse;
+import danang03.STBackend.domain.employee.dto.EmployeeSimpleResponse;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import danang03.STBackend.domain.image.S3Service;
 import danang03.STBackend.domain.projects.EmployeeProject;
@@ -11,6 +20,9 @@ import danang03.STBackend.domain.projects.Project;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponseForEmployeeDetail;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.aspectj.weaver.ast.Literal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +81,15 @@ public class EmployeeService {
                 .joiningDate(employee.getJoiningDate())
                 .role(employee.getRole())
                 .imageUrl(employee.getImageUrl()).build();
+    }
+
+    public List<EmployeeSimpleResponse> getAllEmployeesSimple() {
+        return  employeeRepository.findAll()
+                .stream().map(employee -> new EmployeeSimpleResponse(
+                        employee.getId(),
+                        employee.getName(),
+                        employee.getImageUrl())
+                ).toList();
     }
 
     public EmployeeDetailResponse getEmployeeDetail(Long employeeId) {
@@ -198,4 +219,45 @@ public class EmployeeService {
     }
 
 
+
+    /****************
+     ****** CV  *****
+     ****************/
+
+    public File makeCV(Long employeeId) throws IOException {
+        final String templatePath = "src/main/resources/cv/cvTemplate.pdf"; // Canva에서 다운로드한 PDF 경로
+        final String outputPath = "src/main/resources/cv/output.pdf"; // 데이터가 삽입된 결과 PDF 경로
+
+        Employee employee = employeeRepository.findById(employeeId).orElse(null);
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " does not exist");
+        }
+
+        // 기존 PDF 템플릿 읽기
+        PdfReader pdfReader = new PdfReader(templatePath);
+        PdfWriter pdfWriter = new PdfWriter(outputPath);
+        PdfDocument pdfDoc = new PdfDocument(pdfReader, pdfWriter);
+        Document document = new Document(pdfDoc);
+
+        // 데이터 삽입
+        PdfPage page = pdfDoc.getPage(1); // 첫 번째 페이지 선택
+
+        // 이름 추가
+        document.showTextAligned(new Paragraph("Stefano Accorsi"),
+                100, 700, 1, TextAlignment.LEFT, VerticalAlignment.TOP, 0);
+
+        // 연락처 추가
+        document.showTextAligned(new Paragraph("Phone: +123-456-7890"),
+                100, 680, 1, TextAlignment.LEFT, VerticalAlignment.TOP, 0);
+
+        // 작업 경험 추가
+        document.showTextAligned(new Paragraph("Human Resource Project | 2037.07-2037.10"),
+                100, 640, 1, TextAlignment.LEFT, VerticalAlignment.TOP, 0);
+
+        // 문서 닫기
+        document.close();
+        System.out.println("PDF에 데이터 삽입 완료: " + outputPath);
+
+        return new File(outputPath);
+    }
 }
