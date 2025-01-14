@@ -40,7 +40,7 @@ public class ProjectService {
     }
 
     public Long addProject(ProjectAddRequest request) {
-        Project project = new Project(request.getName(), request.getDescription(), request.getStatus());
+        Project project = new Project(request.getName(), request.getDescription());
         projectRepository.save(project);
 
         return project.getId();
@@ -140,6 +140,12 @@ public class ProjectService {
         }
         else if (previousStatus == ProjectStatus.WORKING && request.getStatus() == ProjectStatus.COMPLETE) {
             project.setEndDate(LocalDate.now());
+        }
+        else if (previousStatus == ProjectStatus.COMPLETE && request.getStatus() == ProjectStatus.WORKING) {
+            project.setEndDate(null);
+        }
+        else if (previousStatus == ProjectStatus.WORKING && request.getStatus() == ProjectStatus.PENDING) {
+            project.setStartDate(null);
         }
 
         projectRepository.save(project);
