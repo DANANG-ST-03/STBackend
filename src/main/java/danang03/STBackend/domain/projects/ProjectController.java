@@ -1,8 +1,10 @@
 package danang03.STBackend.domain.projects;
 
 import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentResponse;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeJoinStatusRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddResponse;
+import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
 import danang03.STBackend.domain.projects.dto.ProjectUpdateResponse;
@@ -41,8 +43,6 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<GlobalResponse> addProject(@RequestBody ProjectAddRequest request) {
-        System.out.println("Project Name: " + request.getName());
-        System.out.println("Project Status: " + request.getStatus()); // Enum 값 출력
         Long projectId = projectService.addProject(request);
         ProjectAddResponse response = new ProjectAddResponse(projectId);
         GlobalResponse globalResponse = GlobalResponse.builder()
@@ -54,12 +54,24 @@ public class ProjectController {
     }
 
 
+
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<GlobalResponse> getProjectDetail(@PathVariable Long id) {
+        ProjectDetailResponse projectDetail = projectService.getProjectDetail(id);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("get Project id " + id + " detail success")
+                .data(projectDetail).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
+
     @GetMapping
     public ResponseEntity<GlobalResponse> getProjectsByPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Pageable pageable) {
-        Page<ProjectResponse> projects = projectService.getProjects(PageRequest.of(page, size));
+        Page<ProjectResponse> projects = projectService.getProjectsByPage(PageRequest.of(page, size));
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("get projects success")
@@ -67,7 +79,7 @@ public class ProjectController {
         return ResponseEntity.ok(globalResponse);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<GlobalResponse> updateProject(@PathVariable Long id, @RequestBody ProjectUpdateRequest request) {
         projectService.updateProject(id, request);
         ProjectUpdateResponse projectUpdateResponse = new ProjectUpdateResponse(id);
@@ -78,6 +90,7 @@ public class ProjectController {
 
         return ResponseEntity.ok(globalResponse);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<GlobalResponse> deleteProject(@PathVariable Long id) {
@@ -110,6 +123,20 @@ public class ProjectController {
                 .status(200)
                 .message("Employee assigned to project successfully")
                 .data(responses).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
+    @PutMapping("{projectId}/employee/{employeeId}")
+    public ResponseEntity<GlobalResponse> changeEmployeeJoinStatus(
+            @PathVariable Long projectId,
+            @PathVariable Long employeeId,
+            @RequestBody EmployeeProjectChangeJoinStatusRequest joinStatusRequest
+    ) {
+        projectService.changeEmployeeJoinStatus(projectId, employeeId, joinStatusRequest);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("Employee changed joinStatus to " + joinStatusRequest.getJoinStatus() + " successfully")
+                .data(null).build();
         return ResponseEntity.ok(globalResponse);
     }
 

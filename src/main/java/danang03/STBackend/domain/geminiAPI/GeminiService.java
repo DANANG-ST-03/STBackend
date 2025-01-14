@@ -2,6 +2,7 @@ package danang03.STBackend.domain.geminiAPI;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -109,6 +110,7 @@ public class GeminiService {
             return results;
         } catch (Exception e) {
             throw new RuntimeException("Failed to find relevant data. Please check your input or restart the chatbot.");
+
         }
     }
 
@@ -119,10 +121,10 @@ public class GeminiService {
 
         StringBuilder resultsBuilder = new StringBuilder(
                 "Process the provided data as-is and convert it into natural language by listing the values clearly. " +
-//                        "For example:\n" +
-//                        "{name=Alexander Jade}\\n{name=Alice Brown} should be transformed into Alexander Jade, Alice Brown.\n" +
-//                        "{name=Elijah Copper, email=elijah.copper@example.com}\\n{name=Sofia Ruby, email=sofia.ruby@example.com} should be transformed into Elijah Copper, whose email is elijah.copper@example.com. Sofia Ruby, whose email is sofia.ruby@example.com.\n" +
-//                        "{name=Website Revamp, description=Complete redesign of the company website}\\The project 'Website Revamp' involves a complete redesign of the company website.\n" +
+                        "For example:\n" +
+                        "{name=Alexander Jade}\\n{name=Alice Brown} should be transformed into Alexander Jade, Alice Brown.\n" +
+                        "{name=Elijah Copper, email=elijah.copper@example.com}\\n{name=Sofia Ruby, email=sofia.ruby@example.com} should be transformed into Elijah Copper, whose email is elijah.copper@example.com. Sofia Ruby, whose email is sofia.ruby@example.com.\n" +
+                        "{name=Website Revamp, description=Complete redesign of the company website}\\The project 'Website Revamp' involves a complete redesign of the company website.\n" +
                         "While avoiding assumptions or unrelated information, you may adjust the sentence structure.\n\n"
         );
         for (Map<String, Object> row : queryResults) {
@@ -182,30 +184,5 @@ public class GeminiService {
 
         return generateNaturalLanguageFromResults(queryResults);
     }
-/*
-    public String processNaturalLanguageQuery(String naturalLanguagePrompt) {
-        // Step 1: Convert natural language to SQL query
-        String rawSQLQuery = generateSQLFromPrompt(naturalLanguagePrompt);
-
-        // Sanitize the SQL query to remove Markdown syntax
-        String sanitizedSQLQuery = sanitizeSQLQuery(rawSQLQuery);
-        System.out.println("Generated SQL Query: " + sanitizedSQLQuery);
-
-        // Step 2: Execute the SQL query
-        List<Map<String, Object>> queryResults;
-        try {
-            queryResults = executeSQLQuery(sanitizedSQLQuery);
-        } catch (Exception e) {
-            return e.getMessage();
-        }
-
-        // Handle empty results
-        if (queryResults.isEmpty()) {
-            return "No data found";
-        }
-
-        // Step 3: Convert query results to natural language
-        return generateNaturalLanguageFromResults(queryResults);
-    }*/
 
 }

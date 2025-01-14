@@ -28,6 +28,8 @@ public class Employee {
 
     @Column(nullable = false)
     private String name;
+    private String first_name;
+    private String last_name;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -35,8 +37,9 @@ public class Employee {
     private String skills;
     private LocalDate joiningDate;
     private String role;
+    private String imageUrl;
 
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "employee")
     private List<EmployeeProject> employeeProjects = new ArrayList<>();
 
 
@@ -48,5 +51,9 @@ public class Employee {
         this.skills = skills != null ? skills : this.skills;
         this.joiningDate = joiningDate != null ? joiningDate : this.joiningDate;
         this.role = role != null ? role : this.role;
+    }
+
+    public void updateImage(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
