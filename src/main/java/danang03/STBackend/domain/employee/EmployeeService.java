@@ -1,13 +1,5 @@
 package danang03.STBackend.domain.employee;
 
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.PdfReader;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.VerticalAlignment;
 import danang03.STBackend.domain.employee.dto.AddEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.EmployeeDetailResponse;
 import danang03.STBackend.domain.employee.dto.EmployeeResponse;
@@ -20,11 +12,8 @@ import danang03.STBackend.domain.projects.Project;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponseForEmployeeDetail;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import org.aspectj.weaver.ast.Literal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -75,6 +65,8 @@ public class EmployeeService {
         return EmployeeResponse.builder()
                 .id(employee.getId())
                 .name(employee.getName())
+                .firstName(employee.getFirstName())
+                .lastName(employee.getLastName())
                 .email(employee.getEmail())
                 .contact(employee.getContact())
                 .skills(employee.getSkills())
@@ -121,7 +113,11 @@ public class EmployeeService {
 
 
                     return new ProjectResponseForEmployeeDetail(projectResponse, employeeProjectResponse);
-                }).toList();
+                })
+                .sorted(Comparator.comparing(
+                        element -> element.getProjectInfo().getStartDate()
+                ))
+                .toList();
         return new EmployeeDetailResponse(employeeResponse, projectResponses);
     }
 
@@ -219,46 +215,4 @@ public class EmployeeService {
         }
     }
 
-
-
-    /****************
-     ****** CV  *****
-     ****************/
-
-    public File makeCV(Long employeeId) throws IOException {
-        final String templatePath = "src/main/resources/cv/cvTemplate.pdf"; // Canva에서 다운로드한 PDF 경로
-        final String outputPath = "src/main/resources/cv/output.pdf"; // 데이터가 삽입된 결과 PDF 경로
-
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
-        if (employee == null) {
-            throw new IllegalArgumentException("Employee with id " + employeeId + " does not exist");
-        }
-
-        // 기존 PDF 템플릿 읽기
-        PdfReader pdfReader = new PdfReader(templatePath);
-        PdfWriter pdfWriter = new PdfWriter(outputPath);
-        PdfDocument pdfDoc = new PdfDocument(pdfReader, pdfWriter);
-        Document document = new Document(pdfDoc);
-
-        // 데이터 삽입
-        PdfPage page = pdfDoc.getPage(1); // 첫 번째 페이지 선택
-
-        // 이름 추가
-        document.showTextAligned(new Paragraph("Stefano Accorsi"),
-                100, 700, 1, TextAlignment.LEFT, VerticalAlignment.TOP, 0);
-
-        // 연락처 추가
-        document.showTextAligned(new Paragraph("Phone: +123-456-7890"),
-                100, 680, 1, TextAlignment.LEFT, VerticalAlignment.TOP, 0);
-
-        // 작업 경험 추가
-        document.showTextAligned(new Paragraph("Human Resource Project | 2037.07-2037.10"),
-                100, 640, 1, TextAlignment.LEFT, VerticalAlignment.TOP, 0);
-
-        // 문서 닫기
-        document.close();
-        System.out.println("PDF에 데이터 삽입 완료: " + outputPath);
-
-        return new File(outputPath);
-    }
 }

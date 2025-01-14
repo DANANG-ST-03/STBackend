@@ -16,6 +16,7 @@ import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -89,7 +90,11 @@ public class ProjectService {
                             .joinStatus(employeeProject.getJoinStatus()).build();
 
                     return new EmployeeResponseForProjectDetail(employeeResponse, employeeProjectResponse);
-                }).toList();
+                })
+                .sorted(Comparator.comparing(
+                        element -> element.getEmployeeInfo().getName()
+                ))
+                .toList();
 
         return new ProjectDetailResponse(projectResponse, employeeResponses);
     }
