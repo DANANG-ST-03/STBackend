@@ -136,16 +136,17 @@ public class EmployeeService {
         );
 
         return employeeRepository.findAll(sortedPageable)
-                .map(employee -> new EmployeeResponse(
-                        employee.getId(),
-                        employee.getName(),
-                        employee.getEmail(),
-                        employee.getContact(),
-                        employee.getSkills(),
-                        employee.getJoiningDate(),
-                        employee.getRole(),
-                        employee.getImageUrl()
-                ));
+                .map(employee -> EmployeeResponse.builder()
+                        .id(employee.getId())
+                        .name(employee.getName())
+                        .firstName(employee.getFirstName())
+                        .lastName(employee.getLastName())
+                        .email(employee.getEmail())
+                        .contact(employee.getContact())
+                        .skills(employee.getSkills())
+                        .joiningDate(employee.getJoiningDate())
+                        .role(employee.getRole())
+                        .imageUrl(employee.getImageUrl()).build());
     }
 
 
