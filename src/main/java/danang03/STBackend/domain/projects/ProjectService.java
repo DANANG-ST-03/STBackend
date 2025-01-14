@@ -200,19 +200,56 @@ public class ProjectService {
         if (!employeeRepository.existsById(employeeId)) {
             throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
         }
-        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId);
+        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId).orElse(null);
+        if (employeeProject == null) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " is not assigned for project with id " + projectId);
+        }
 
         JoinStatus previousJoinStatus = employeeProject.getJoinStatus();
         JoinStatus newJoinStatus = joinStatusRequest.getJoinStatus();
+        if (previousJoinStatus == newJoinStatus) {
+            return;
+        }
 
-        if (previousJoinStatus == JoinStatus.DOING && newJoinStatus == JoinStatus.EXITED) {
+        if (newJoinStatus == JoinStatus.READY) {
+            employeeProject.setJoinStatus(newJoinStatus);
+            employeeProject.setJoinDate(null);
+            employeeProject.setExitDate(null);
+        }
+        else if (newJoinStatus == JoinStatus.DOING) {
+            employeeProject.setJoinStatus(newJoinStatus);
+            employeeProject.setJoinDate(LocalDate.now());
+            employeeProject.setExitDate(null);
+        }
+        else if (newJoinStatus == JoinStatus.EXITED) {
             employeeProject.setJoinStatus(newJoinStatus);
             employeeProject.setExitDate(LocalDate.now());
         }
-        else if (previousJoinStatus == JoinStatus.EXITED && newJoinStatus == JoinStatus.DOING) {
-            employeeProject.setJoinStatus(newJoinStatus);
-            employeeProject.setExitDate(null);
-        }
+
+//        if (previousJoinStatus == JoinStatus.READY && newJoinStatus == JoinStatus.DOING) {
+//            employeeProject.setJoinStatus(newJoinStatus);
+//            employeeProject.setJoinDate(LocalDate.now());
+//        }
+//        else if (previousJoinStatus == JoinStatus.DOING && newJoinStatus == JoinStatus.EXITED) {
+//            employeeProject.setJoinStatus(newJoinStatus);
+//            employeeProject.setExitDate(LocalDate.now());
+//        }
+//
+//        else if (previousJoinStatus == JoinStatus.EXITED && newJoinStatus == JoinStatus.DOING) {
+//            employeeProject.setJoinStatus(newJoinStatus);
+//            employeeProject.setExitDate(null);
+//        }
+//
+//        // 추가 논의 필요
+//        else if (previousJoinStatus == JoinStatus.DOING && newJoinStatus == JoinStatus.READY) {
+//            employeeProject.setJoinStatus(newJoinStatus);
+//            employeeProject.setJoinDate(null);
+//        }
+//        else if (previousJoinStatus == JoinStatus.READY && newJoinStatus == JoinStatus.EXITED) {
+//            employeeProject.setJoinStatus(newJoinStatus);
+//            employeeProject.setExitDate(null);
+//        }
+
 
 
         employeeProjectRepository.save(employeeProject);
