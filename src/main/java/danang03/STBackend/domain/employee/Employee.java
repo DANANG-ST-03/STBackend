@@ -39,7 +39,7 @@ public class Employee {
     private String role;
     private String imageUrl;
 
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "employee")
     private List<EmployeeProject> employeeProjects = new ArrayList<>();
 
 

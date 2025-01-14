@@ -18,31 +18,49 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @Column(nullable = false)
     private String name;
 
+    @Setter
     private String description;
 
+    @Setter
     private LocalDate startDate;
 
+    @Setter
     private LocalDate endDate;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "project")
     private List<EmployeeProject> employeeProjects = new ArrayList<>();
+
+
+    public Project(String name, String description, ProjectStatus status) {
+        this.name = name;
+        this.description = description;
+        this.startDate = null;
+        this.endDate = null;
+        this.status = status;
+
+        if (status == ProjectStatus.WORKING) {
+            startDate = LocalDate.now();
+        }
+    }
 
     // 업데이트를 위한 메서드
     public void update(String name, String description, LocalDate startDate, LocalDate endDate, ProjectStatus status) {

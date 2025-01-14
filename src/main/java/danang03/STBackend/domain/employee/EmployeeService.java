@@ -8,6 +8,7 @@ import danang03.STBackend.domain.image.S3Service;
 import danang03.STBackend.domain.projects.EmployeeProject;
 import danang03.STBackend.domain.projects.EmployeeProjectRepository;
 import danang03.STBackend.domain.projects.Project;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponseForEmployeeDetail;
 import java.util.List;
@@ -71,22 +72,35 @@ public class EmployeeService {
     }
 
     public EmployeeDetailResponse getEmployeeDetail(Long employeeId) {
+        // employeeInfo
         EmployeeResponse employeeResponse = getEmployee(employeeId);
+
+        // projectsInfo
         List<EmployeeProject> employeeProjects = employeeProjectRepository.findByEmployeeId(employeeId);
         List<ProjectResponseForEmployeeDetail> projectResponses = employeeProjects.stream()
                 .map(employeeProject -> {
                     Project project = employeeProject.getProject();
-                        return ProjectResponseForEmployeeDetail.builder()
-                                .id(project.getId())
-                                .name(project.getName())
-                                .description(project.getDescription())
-                                .startDate(project.getStartDate())
-                                .endDate(project.getEndDate())
-                                .status(project.getStatus())
-                                .roleInProject(employeeProject.getRole())
-                                .contribution(employeeProject.getContribution()).build();
-                })
-                .toList();
+
+                    // projectInfo
+                    ProjectResponse projectResponse = ProjectResponse.builder()
+                            .id(project.getId())
+                            .name(project.getName())
+                            .description(project.getDescription())
+                            .startDate(project.getStartDate())
+                            .endDate(project.getEndDate())
+                            .status(project.getStatus()).build();
+
+                    // employeeProjectInfo
+                    EmployeeProjectResponse employeeProjectResponse = EmployeeProjectResponse.builder()
+                            .roleInProject(employeeProject.getRole())
+                            .contribution(employeeProject.getContribution())
+                            .joinDate(employeeProject.getJoinDate())
+                            .exitDate(employeeProject.getExitDate())
+                            .joinStatus(employeeProject.getJoinStatus()).build();
+
+
+                    return new ProjectResponseForEmployeeDetail(projectResponse, employeeProjectResponse);
+                }).toList();
         return new EmployeeDetailResponse(employeeResponse, projectResponses);
     }
 
@@ -94,7 +108,10 @@ public class EmployeeService {
         Pageable sortedPageable = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "joiningDate") // 최신순 정렬
+                Sort.by(
+                        Sort.Order.desc("joiningDate"), // startDate 기준 내림차순, null은 마지막
+                        Sort.Order.asc("id")
+                )
         );
 
         return employeeRepository.findAll(sortedPageable)

@@ -1,9 +1,12 @@
 package danang03.STBackend.config.auth;
 
 import danang03.STBackend.config.auth.dto.JwtToken;
+import danang03.STBackend.config.auth.dto.SignInResponse;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
 import danang03.STBackend.config.auth.dto.SignUpResponse;
 import danang03.STBackend.config.auth.dto.SigninRequest;
+import danang03.STBackend.domain.member.Member;
+import danang03.STBackend.domain.member.MemberRepository;
 import danang03.STBackend.domain.member.MemberService;
 import danang03.STBackend.dto.GlobalResponse;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,10 +26,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class AuthController {
 
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     @Autowired
-    public AuthController(MemberService memberService) {
+    public AuthController(MemberService memberService, MemberRepository memberRepository) {
         this.memberService = memberService;
+        this.memberRepository = memberRepository;
     }
 
     @GetMapping("/signup")
@@ -78,7 +83,7 @@ public class AuthController {
 
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/signin")
-    public ResponseEntity<?> login(@RequestBody SigninRequest request, HttpServletResponse response) {
+    public ResponseEntity<GlobalResponse> login(@RequestBody SigninRequest request, HttpServletResponse response) {
         String email = request.getEmail();
         String password = request.getPassword();
 
@@ -96,10 +101,12 @@ public class AuthController {
             response.setHeader("Refresh-Token", jwtToken.getRefreshToken());
 
             // 응답 바디를 구성하여 클라이언트에 추가 데이터 반환
+            Member member = memberRepository.findByEmail(email).orElse(null);
+            SignInResponse signInResponse = new SignInResponse(member.getId(), jwtToken);
             GlobalResponse globalResponse = GlobalResponse.builder()
                     .status(200)
                     .message("signin success")
-                    .data(jwtToken)
+                    .data(signInResponse)
                     .build();
 
             return ResponseEntity.ok(globalResponse);
