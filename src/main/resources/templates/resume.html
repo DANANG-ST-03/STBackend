@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Resume</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        .header {
+            background-color: #f2f2f2;
+            padding: 10px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1 th:text="${employeeDetail.getEmployeeInfo().getName()}">Name</h1>
+    <h3 th:text="${employeeDetail.getEmployeeInfo().getSkills()}">Skills</h3>
+</div>
+<div>
+    <span class="section-title">Contact</span>
+    <p>email: <span th:text="${employeeDetail.employeeInfo.email}">example@example.com</span></p>
+    <p>연락처: <span th:text="${employeeDetail.employeeInfo.contact}">777-777-7777</span></p>
+</div>
+</body>
+</html>

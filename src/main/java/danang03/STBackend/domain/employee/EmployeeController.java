@@ -11,6 +11,8 @@ import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeResponse;
 import danang03.STBackend.domain.image.S3Service;
 import danang03.STBackend.dto.GlobalResponse;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +39,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -43,13 +49,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class EmployeeController {
     private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);
     private final EmployeeService employeeService;
-    private final S3Service s3Service;
+    private final TemplateEngine templateEngine;
 
 
     @Autowired
-    public EmployeeController(EmployeeService employeeService, S3Service s3Service) {
+    public EmployeeController(EmployeeService employeeService, TemplateEngine templateEngine) {
         this.employeeService = employeeService;
-        this.s3Service = s3Service;
+        this.templateEngine = templateEngine;
     }
 
     @PostMapping
@@ -174,16 +180,38 @@ public class EmployeeController {
      ****************/
 
     @GetMapping("/{id}/cv")
-    public ResponseEntity<Resource> employeePage(@PathVariable("id") Long employeeId) throws IOException {
-        File pdfFile = employeeService.makeCV(employeeId);
+    public void employeeCV(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+        // 1) 서비스 통해 데이터 가져오기
+        EmployeeDetailResponse detailResponse = employeeService.getEmployeeDetail(id);
 
-        // PDF 파일을 Resource로 변환
-        Resource resource = new FileSystemResource(pdfFile);
+        // Thymeleaf Context에 데이터 설정
+        Context context = new Context();
+        context.setVariable("employeeDetail", detailResponse);
+        // 필요한 데이터들을 추가로 setVariable() ...
 
-        // HTTP 응답으로 PDF 반환
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + pdfFile.getName()) // 파일 다운로드 설정
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(resource);
+        // 2) Thymeleaf 템플릿 -> HTML 문자열 변환
+        String htmlContent = templateEngine.process("resume", context);
+
+        // 3) HTML -> PDF (Flying Saucer iTextRenderer 사용)
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ITextRenderer renderer = new ITextRenderer();
+        renderer.setDocumentFromString(htmlContent);
+
+        // 혹시 템플릿 내에서 이미지나 CSS 파일 등을 상대 경로로 참조한다면
+        // renderer.getSharedContext().setBaseURL("file:/템플릿_리소스_경로/");
+        // 또는 classpath 기반 경로 설정 등 필요
+
+        renderer.layout();
+        renderer.createPDF(baos);
+
+        byte[] pdfBytes = baos.toByteArray();
+
+        // 4) 브라우저로 PDF 내보내기 (다운로드 응답)
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=\"resume.pdf\"");
+        response.setContentLength(pdfBytes.length);
+
+        response.getOutputStream().write(pdfBytes);
+        response.getOutputStream().flush();
     }
 }
