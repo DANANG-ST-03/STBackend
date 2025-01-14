@@ -41,7 +41,7 @@ public class EmployeeProject {
 
     private String contribution;
 
-
+    @Setter
     private LocalDate joinDate;
 
     @Setter
@@ -56,9 +56,9 @@ public class EmployeeProject {
         this.project = project;
         this.role = role;
         this.contribution = contribution;
-        this.joinDate = LocalDate.now();
+        this.joinDate = null;
         this.exitDate = null;
-        this.joinStatus = JoinStatus.DOING;
+        this.joinStatus = JoinStatus.READY;
     }
 
     public enum Role {
@@ -71,6 +71,7 @@ public class EmployeeProject {
     }
 
     public enum JoinStatus {
+        READY,
         DOING,
         EXITED
     }
