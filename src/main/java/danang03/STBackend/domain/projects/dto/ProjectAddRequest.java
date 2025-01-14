@@ -10,7 +10,7 @@ import lombok.Getter;
 public class ProjectAddRequest {
     private String name;
     private String description;
-    private LocalDate startDate;
-    private LocalDate endDate;
+//    private LocalDate startDate;
+//    private LocalDate endDate;
     private ProjectStatus status;
 }

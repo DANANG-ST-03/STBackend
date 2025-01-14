@@ -2,6 +2,7 @@ package danang03.STBackend.domain.geminiAPI;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -116,6 +117,7 @@ public class GeminiService {
             return results;
         } catch (Exception e) {
             throw new RuntimeException("Failed to find relevant data. Please check your input or restart the chatbot.");
+
         }
     }
 
@@ -131,6 +133,7 @@ public class GeminiService {
                         "{name=Website Revamp, description=Complete redesign of the company website}\\The project 'Website Revamp' involves a complete redesign of the company website.\n" +
                         "While avoiding assumptions or unrelated information, you may adjust the sentence structure. " +
                         "Speak in user-friendly language.\n\n"
+
         );
         for (Map<String, Object> row : queryResults) {
             resultsBuilder.append(row.toString()).append("\n");

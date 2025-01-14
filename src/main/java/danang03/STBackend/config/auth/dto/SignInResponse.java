@@ -7,4 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SignInResponse {
     private Long memberId;
+    private JwtToken jwtToken;
 }
