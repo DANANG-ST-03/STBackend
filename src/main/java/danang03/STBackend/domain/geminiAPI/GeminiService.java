@@ -31,17 +31,24 @@ public class GeminiService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // Add input to session history
+    // Initializes the schema cache if it has not been populated yet
+    private void initializeSchemaCache() {
+        if (schemaCache == null) {
+            schemaCache = getAllTableSchemas();
+        }
+    }
+
+    // Add input to session history for a given session ID
     public void addToSessionHistory(String sessionId, String input) {
         sessionHistory.computeIfAbsent(sessionId, k -> new ArrayList<>()).add(input);
     }
 
-    // Retrieve session history
+    // Retrieve session history for a given session ID
     public List<String> getSessionHistory(String sessionId) {
         return sessionHistory.getOrDefault(sessionId, new ArrayList<>());
     }
 
-    // Clear session history
+    // Clear session history for a given session ID
     public void clearSessionHistory(String sessionId) {
         sessionHistory.remove(sessionId);
     }
@@ -80,88 +87,7 @@ public class GeminiService {
         return schemas;
     }
 
-    private void initializeSchemaCache() {
-        if (schemaCache == null) {
-            schemaCache = getAllTableSchemas();
-        }
-    }
-
-    public String generateSQLFromPrompt(String naturalLanguagePrompt, List<String> recentHistory) {
-        initializeSchemaCache();
-        StringBuilder schemaBuilder = new StringBuilder("Based on the following table schemas:\n\n");
-        for (String schema : schemaCache) {
-            schemaBuilder.append(schema).append("\n\n");
-        }
-
-        StringBuilder historyContext = new StringBuilder("Refer to the session history for additional context:\n");
-        for (String historyItem : recentHistory) {
-            historyContext.append(historyItem).append("\n");
-        }
-
-        String fullPrompt = schemaBuilder.toString() +
-                historyContext +
-                "Use LOWER() or ILIKE for case-insensitive matching. " +
-                "Focus on the most recent history. " +
-                "If the query includes a person's name, handle it as an employee. " +
-                "If it includes a project name, handle it as a project. " +
-                "Otherwise, generate only the SQL query without opinions:\n" +
-                naturalLanguagePrompt;
-
-        GeminiRequest request = new GeminiRequest(fullPrompt);
-        System.out.println(request);
-        GeminiResponse response = geminiApi.generateContent(model, request, apiKey);
-
-        return response.getCandidates().stream()
-                .findFirst()
-                .map(candidate -> candidate.getContent().getParts().get(0).getText())
-                .orElse("No SQL query generated");
-    }
-
-    public List<Map<String, Object>> executeSQLQuery(String sqlQuery) {
-        try {
-            List<Map<String, Object>> results = jdbcTemplate.queryForList(sqlQuery);
-            if (results.isEmpty()) {
-                throw new RuntimeException("No relevant data found.");
-            }
-            return results;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to find relevant data. Please check your input or restart the chatbot.");
-
-        }
-    }
-
-    public String generateNaturalLanguageFromResults(List<Map<String, Object>> queryResults) {
-        if (queryResults == null || queryResults.isEmpty()) {
-            return "We couldn't find any relevant information based on your request.";
-        }
-
-        StringBuilder resultsBuilder = new StringBuilder(
-                "Process the provided data as-is and convert it into natural language by listing the values clearly. " +
-                        "For example:\n" +
-                        "{name=Alexander Jade}\\n{name=Alice Brown} should be transformed into Alexander Jade, Alice Brown.\n" +
-                        "{name=Website Revamp, description=Complete redesign of the company website}\\The project 'Website Revamp' involves a complete redesign of the company website.\n" +
-                        "While avoiding assumptions or unrelated information, you may adjust the sentence structure. " +
-                        "Speak in user-friendly language.\n\n"
-
-        );
-        for (Map<String, Object> row : queryResults) {
-            resultsBuilder.append(row.toString()).append("\n");
-        }
-
-        GeminiRequest request = new GeminiRequest(resultsBuilder.toString());
-        GeminiResponse response = geminiApi.generateContent(model, request, apiKey);
-
-        return response.getCandidates().stream()
-                .findFirst()
-                .map(candidate -> candidate.getContent().getParts().get(0).getText())
-                .orElse("No meaningful insights could be generated.");
-    }
-
-    public String sanitizeSQLQuery(String sqlQuery) {
-        // Remove Markdown-style code block syntax
-        return sqlQuery.replaceAll("```sql", "").replaceAll("```", "").trim();
-    }
-
+// Processes a natural language query, incorporating session history and generating a SQL query
     public String processNaturalLanguageQuery(String naturalLanguagePrompt, String sessionId) {
         // Retrieve session history
         List<String> history = getSessionHistory(sessionId);
@@ -193,37 +119,83 @@ public class GeminiService {
 
         return generateNaturalLanguageFromResults(queryResults);
     }
-    /*
 
-        public String processNaturalLanguageQuery(String naturalLanguagePrompt, String sessionId) {
-        // Retrieve session history
-        List<String> history = getSessionHistory(sessionId);
-
-        // Combine history with the current prompt
-        StringBuilder promptBuilder = new StringBuilder("Session History:\n");
-        for (String pastInput : history) {
-            promptBuilder.append(pastInput).append("\n");
+    // Generates an SQL query from a natural language prompt and recent session history
+    public String generateSQLFromPrompt(String naturalLanguagePrompt, List<String> recentHistory) {
+        initializeSchemaCache();
+        StringBuilder schemaBuilder = new StringBuilder("Based on the following table schemas:\n\n");
+        for (String schema : schemaCache) {
+            schemaBuilder.append(schema).append("\n\n");
         }
-        promptBuilder.append("Current Query: ").append(naturalLanguagePrompt);
 
-        String fullPrompt = promptBuilder.toString();
+        StringBuilder historyContext = new StringBuilder("Refer to the session history for additional context:\n");
+        for (String historyItem : recentHistory) {
+            historyContext.append(historyItem).append("\n");
+        }
 
-        // Existing logic for processing the query...
-        String rawSQLQuery = generateSQLFromPrompt(fullPrompt);
-        String sanitizedSQLQuery = sanitizeSQLQuery(rawSQLQuery);
-        System.out.println(rawSQLQuery);
-        List<Map<String, Object>> queryResults;
+        String fullPrompt = schemaBuilder.toString() +
+                historyContext +
+                "Use LOWER() or ILIKE for case-insensitive matching. " +
+                "Focus on the most recent history. " +
+                "If the query includes a person's name, handle it as an employee. " +
+                "If it includes a project name, handle it as a project. " +
+                "Otherwise, generate only the SQL query without opinions:\n" +
+                naturalLanguagePrompt;
 
+        GeminiRequest request = new GeminiRequest(fullPrompt);
+        System.out.println(request);
+        GeminiResponse response = geminiApi.generateContent(model, request, apiKey);
+
+        return response.getCandidates().stream()
+                .findFirst()
+                .map(candidate -> candidate.getContent().getParts().get(0).getText())
+                .orElse("No SQL query generated");
+    }
+
+    // Remove Markdown-style code block syntax from the SQL query
+    public String sanitizeSQLQuery(String sqlQuery) {
+        return sqlQuery.replaceAll("```sql", "").replaceAll("```", "").trim();
+    }
+
+    // Executes the given SQL query and retrieves the results
+    public List<Map<String, Object>> executeSQLQuery(String sqlQuery) {
         try {
-            queryResults = executeSQLQuery(sanitizedSQLQuery);
+            List<Map<String, Object>> results = jdbcTemplate.queryForList(sqlQuery);
+            if (results.isEmpty()) {
+                throw new RuntimeException("No relevant data found.");
+            }
+            return results;
         } catch (Exception e) {
-            return e.getMessage();
+            throw new RuntimeException("Failed to find relevant data. Please check your input or restart the chatbot.");
+
+        }
+    }
+
+    // Converts the SQL query results into a natural language response
+    public String generateNaturalLanguageFromResults(List<Map<String, Object>> queryResults) {
+        if (queryResults == null || queryResults.isEmpty()) {
+            return "We couldn't find any relevant information based on your request.";
         }
 
-        if (queryResults.isEmpty()) {
-            return "No data found";
+        StringBuilder resultsBuilder = new StringBuilder(
+                "Process the provided data as-is and convert it into natural language by listing the values clearly. " +
+                        "For example:\n" +
+                        "{name=Alexander Jade}\\n{name=Alice Brown} should be transformed into Alexander Jade, Alice Brown.\n" +
+                        "{name=Website Revamp, description=Complete redesign of the company website}\\The project 'Website Revamp' involves a complete redesign of the company website.\n" +
+                        "While avoiding assumptions or unrelated information, you may adjust the sentence structure. " +
+                        "Speak in user-friendly language.\n\n"
+
+        );
+        for (Map<String, Object> row : queryResults) {
+            resultsBuilder.append(row.toString()).append("\n");
         }
 
-        return generateNaturalLanguageFromResults(queryResults);
-    }*/
+        GeminiRequest request = new GeminiRequest(resultsBuilder.toString());
+        GeminiResponse response = geminiApi.generateContent(model, request, apiKey);
+
+        return response.getCandidates().stream()
+                .findFirst()
+                .map(candidate -> candidate.getContent().getParts().get(0).getText())
+                .orElse("No meaningful insights could be generated.");
+    }
 }
