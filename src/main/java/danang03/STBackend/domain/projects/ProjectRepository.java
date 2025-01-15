@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
-    @Query("SELECT p.name FROM Project p WHERE p.name LIKE %:input%")
+    @Query("SELECT p.name FROM Project p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :input, '%'))")
     List<String> findNamesStartingWith(@Param("input") String input, Pageable pageable);
 }
