@@ -42,6 +42,7 @@ public class SuggestionService {
         if (!input.isBlank()) {
             suggestions.add("Search for '" + input + "' in all employee records.");
             suggestions.add("List all projects containing '" + input + "'.");
+            suggestions.add("Find people with the skill of '" + input + "'.");
         }
 
         return suggestions;

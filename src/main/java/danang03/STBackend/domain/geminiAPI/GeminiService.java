@@ -24,6 +24,7 @@ public class GeminiService {
     private final GeminiApi geminiApi;
     private final JdbcTemplate jdbcTemplate;
     private final Map<String, List<String>> sessionHistory = new HashMap<>();
+    private List<String> schemaCache;
 
     public GeminiService(GeminiApi geminiApi, JdbcTemplate jdbcTemplate) {
         this.geminiApi = geminiApi;
@@ -66,7 +67,9 @@ public class GeminiService {
 
     // Retrieve schemas for all tables in the database
     public List<String> getAllTableSchemas() {
-        String query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'";
+        String query = "SELECT table_name FROM information_schema.tables " +
+                "WHERE table_schema = 'public' " +
+                "AND table_name NOT IN ('member', 'auth_users')";
         List<Map<String, Object>> tables = jdbcTemplate.queryForList(query);
 
         List<String> schemas = new ArrayList<>();
@@ -74,21 +77,25 @@ public class GeminiService {
             String tableName = (String) table.get("table_name");
             schemas.add(getTableSchema(tableName));
         }
-
         return schemas;
     }
 
+    private void initializeSchemaCache() {
+        if (schemaCache == null) {
+            schemaCache = getAllTableSchemas();
+        }
+    }
     public String generateSQLFromPrompt(String naturalLanguagePrompt) {
-        List<String> schemas = getAllTableSchemas();
+        initializeSchemaCache();
         StringBuilder schemaBuilder = new StringBuilder("Based on the following table schemas:\n\n");
-        for (String schema : schemas) {
+        for (String schema : schemaCache) {
             schemaBuilder.append(schema).append("\n\n");
         }
 
         String fullPrompt = schemaBuilder.toString() +
                 "Make sure to handle case insensitivity by using LOWER() or ILIKE for text matching. " +
                 "Also, refer to the session history to provide context when generating the SQL query. " +
-                "Convert the following natural language prompt into an SQL query:\n" +
+                "Convert the following natural language prompt into an SQL query. Don't include opinion, just sql:\n" +
                 naturalLanguagePrompt;
 
         GeminiRequest request = new GeminiRequest(fullPrompt);
@@ -123,9 +130,10 @@ public class GeminiService {
                 "Process the provided data as-is and convert it into natural language by listing the values clearly. " +
                         "For example:\n" +
                         "{name=Alexander Jade}\\n{name=Alice Brown} should be transformed into Alexander Jade, Alice Brown.\n" +
-                        "{name=Elijah Copper, email=elijah.copper@example.com}\\n{name=Sofia Ruby, email=sofia.ruby@example.com} should be transformed into Elijah Copper, whose email is elijah.copper@example.com. Sofia Ruby, whose email is sofia.ruby@example.com.\n" +
                         "{name=Website Revamp, description=Complete redesign of the company website}\\The project 'Website Revamp' involves a complete redesign of the company website.\n" +
-                        "While avoiding assumptions or unrelated information, you may adjust the sentence structure.\n\n"
+                        "While avoiding assumptions or unrelated information, you may adjust the sentence structure. " +
+                        "Speak in user-friendly language.\n\n"
+
         );
         for (Map<String, Object> row : queryResults) {
             resultsBuilder.append(row.toString()).append("\n");
@@ -149,15 +157,6 @@ public class GeminiService {
         // Retrieve session history
         List<String> history = getSessionHistory(sessionId);
 
-        if (naturalLanguagePrompt.trim().split(" ").length<= 2) {
-            // 단일 단어 입력 시 템플릿 생성
-            StringBuilder response = new StringBuilder("Here are some suggestions for your query:\n");
-            response.append("Who is ").append(naturalLanguagePrompt).append("?\n");
-            response.append("What is ").append(naturalLanguagePrompt).append("'s role?\n");
-            response.append("What is ").append(naturalLanguagePrompt).append(" project?\n");
-            return response.toString();
-        }
-
         // Combine history with the current prompt
         StringBuilder promptBuilder = new StringBuilder("Session History:\n");
         for (String pastInput : history) {
@@ -170,6 +169,7 @@ public class GeminiService {
         // Existing logic for processing the query...
         String rawSQLQuery = generateSQLFromPrompt(fullPrompt);
         String sanitizedSQLQuery = sanitizeSQLQuery(rawSQLQuery);
+        System.out.println(rawSQLQuery);
         List<Map<String, Object>> queryResults;
 
         try {
@@ -184,5 +184,4 @@ public class GeminiService {
 
         return generateNaturalLanguageFromResults(queryResults);
     }
-
 }

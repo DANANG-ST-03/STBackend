@@ -24,6 +24,8 @@ public class GeminiController {
 
         // Process the query
         String response = geminiService.processNaturalLanguageQuery(naturalLanguagePrompt, sessionId);
+        geminiService.addToSessionHistory(sessionId, response);
+
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("successfully got answer from gemini")
@@ -50,12 +52,5 @@ public class GeminiController {
                 .data(null).build();
         return ResponseEntity.ok(globalResponse);
     }
-    /*
-    @PostMapping("/process-query")
-    public ResponseEntity<String> processQuery(@RequestBody String naturalLanguagePrompt) {
-        String response = geminiService.processNaturalLanguageQuery(naturalLanguagePrompt);
-        return ResponseEntity.ok(response);
-    }*/
-
 }
 
