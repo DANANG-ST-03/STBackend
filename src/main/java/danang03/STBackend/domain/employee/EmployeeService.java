@@ -3,6 +3,7 @@ package danang03.STBackend.domain.employee;
 import danang03.STBackend.domain.employee.dto.AddEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.EmployeeDetailResponse;
 import danang03.STBackend.domain.employee.dto.EmployeeResponse;
+import danang03.STBackend.domain.employee.dto.EmployeeSimpleResponse;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import danang03.STBackend.domain.image.S3Service;
 import danang03.STBackend.domain.projects.EmployeeProject;
@@ -11,8 +12,8 @@ import danang03.STBackend.domain.projects.Project;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectResponseForEmployeeDetail;
+import java.util.Comparator;
 import java.util.List;
-import org.aspectj.weaver.ast.Literal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -43,8 +45,13 @@ public class EmployeeService {
             throw new IllegalArgumentException("Employee with the same email already exists");
         }
 
+        String name = request.getName();
+        String firstName = name.split(" ")[0];
+        String lastName = name.split(" ")[1];
         Employee employee = Employee.builder()
-                .name(request.getName())
+                .name(name)
+                .firstName(firstName)
+                .lastName(lastName)
                 .email(request.getEmail())
                 .contact(request.getContact())
                 .skills(request.getSkills())
@@ -63,12 +70,41 @@ public class EmployeeService {
         return EmployeeResponse.builder()
                 .id(employee.getId())
                 .name(employee.getName())
+                .firstName(employee.getFirstName())
+                .lastName(employee.getLastName())
                 .email(employee.getEmail())
                 .contact(employee.getContact())
                 .skills(employee.getSkills())
                 .joiningDate(employee.getJoiningDate())
                 .role(employee.getRole())
                 .imageUrl(employee.getImageUrl()).build();
+    }
+
+    public List<EmployeeSimpleResponse> getAllEmployeesSimple(Long projectId) {
+        List<Employee> allEmployees = employeeRepository.findAll();
+        if (projectId == null) {
+            return allEmployees.stream()
+                    .map(employee -> new EmployeeSimpleResponse(
+                            employee.getId(),
+                            employee.getName(),
+                            employee.getImageUrl())
+                    ).toList();
+        }
+
+        List<Employee> assignedEmployees = employeeProjectRepository.findByProjectId(projectId).stream()
+                .map(EmployeeProject::getEmployee).toList();
+
+        List<Employee> notAssignedEmployees = allEmployees.stream()
+                .filter(employee -> !assignedEmployees.contains(employee))
+                .toList();
+
+        // 프로젝트에 할당되지 않은 유저들만 필터링
+        return notAssignedEmployees.stream()
+                .map(employee -> new EmployeeSimpleResponse(
+                        employee.getId(),
+                        employee.getName(),
+                        employee.getImageUrl())
+                ).toList();
     }
 
     public EmployeeDetailResponse getEmployeeDetail(Long employeeId) {
@@ -100,7 +136,12 @@ public class EmployeeService {
 
 
                     return new ProjectResponseForEmployeeDetail(projectResponse, employeeProjectResponse);
-                }).toList();
+                })
+                .sorted(Comparator.comparing(
+                        element -> element.getProjectInfo().getStartDate(),
+                        Comparator.nullsLast(Comparator.naturalOrder())
+                ))
+                .toList();
         return new EmployeeDetailResponse(employeeResponse, projectResponses);
     }
 
@@ -115,16 +156,17 @@ public class EmployeeService {
         );
 
         return employeeRepository.findAll(sortedPageable)
-                .map(employee -> new EmployeeResponse(
-                        employee.getId(),
-                        employee.getName(),
-                        employee.getEmail(),
-                        employee.getContact(),
-                        employee.getSkills(),
-                        employee.getJoiningDate(),
-                        employee.getRole(),
-                        employee.getImageUrl()
-                ));
+                .map(employee -> EmployeeResponse.builder()
+                        .id(employee.getId())
+                        .name(employee.getName())
+                        .firstName(employee.getFirstName())
+                        .lastName(employee.getLastName())
+                        .email(employee.getEmail())
+                        .contact(employee.getContact())
+                        .skills(employee.getSkills())
+                        .joiningDate(employee.getJoiningDate())
+                        .role(employee.getRole())
+                        .imageUrl(employee.getImageUrl()).build());
     }
 
 
@@ -196,6 +238,5 @@ public class EmployeeService {
             employeeRepository.save(employee);
         }
     }
-
 
 }

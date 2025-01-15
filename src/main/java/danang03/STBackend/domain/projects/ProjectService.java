@@ -7,6 +7,7 @@ import danang03.STBackend.domain.projects.EmployeeProject.JoinStatus;
 import danang03.STBackend.domain.projects.EmployeeProject.Role;
 import danang03.STBackend.domain.employee.dto.EmployeeResponseForProjectDetail;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeJoinStatusRequest;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeRoleRequest;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectResponse;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
@@ -15,6 +16,7 @@ import danang03.STBackend.domain.projects.dto.ProjectUpdateRequest;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,7 +40,7 @@ public class ProjectService {
     }
 
     public Long addProject(ProjectAddRequest request) {
-        Project project = new Project(request.getName(), request.getDescription(), request.getStatus());
+        Project project = new Project(request.getName(), request.getDescription());
         projectRepository.save(project);
 
         return project.getId();
@@ -88,7 +90,11 @@ public class ProjectService {
                             .joinStatus(employeeProject.getJoinStatus()).build();
 
                     return new EmployeeResponseForProjectDetail(employeeResponse, employeeProjectResponse);
-                }).toList();
+                })
+                .sorted(Comparator.comparing(
+                        element -> element.getEmployeeInfo().getName()
+                ))
+                .toList();
 
         return new ProjectDetailResponse(projectResponse, employeeResponses);
     }
@@ -134,6 +140,12 @@ public class ProjectService {
         }
         else if (previousStatus == ProjectStatus.WORKING && request.getStatus() == ProjectStatus.COMPLETE) {
             project.setEndDate(LocalDate.now());
+        }
+        else if (previousStatus == ProjectStatus.COMPLETE && request.getStatus() == ProjectStatus.WORKING) {
+            project.setEndDate(null);
+        }
+        else if (previousStatus == ProjectStatus.WORKING && request.getStatus() == ProjectStatus.PENDING) {
+            project.setStartDate(null);
         }
 
         projectRepository.save(project);
@@ -194,41 +206,99 @@ public class ProjectService {
         if (!employeeRepository.existsById(employeeId)) {
             throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
         }
-        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId);
+        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId).orElse(null);
+        if (employeeProject == null) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " is not assigned for project with id " + projectId);
+        }
 
         JoinStatus previousJoinStatus = employeeProject.getJoinStatus();
         JoinStatus newJoinStatus = joinStatusRequest.getJoinStatus();
+        if (previousJoinStatus == newJoinStatus) {
+            return;
+        }
 
-        if (previousJoinStatus == JoinStatus.DOING && newJoinStatus == JoinStatus.EXITED) {
+        if (newJoinStatus == JoinStatus.READY) {
+            employeeProject.setJoinStatus(newJoinStatus);
+            employeeProject.setJoinDate(null);
+            employeeProject.setExitDate(null);
+        }
+        else if (newJoinStatus == JoinStatus.DOING) {
+            employeeProject.setJoinStatus(newJoinStatus);
+            employeeProject.setJoinDate(LocalDate.now());
+            employeeProject.setExitDate(null);
+        }
+        else if (newJoinStatus == JoinStatus.EXITED) {
             employeeProject.setJoinStatus(newJoinStatus);
             employeeProject.setExitDate(LocalDate.now());
         }
-        else if (previousJoinStatus == JoinStatus.EXITED && newJoinStatus == JoinStatus.DOING) {
-            employeeProject.setJoinStatus(newJoinStatus);
-            employeeProject.setExitDate(null);
-        }
+
+//        if (previousJoinStatus == JoinStatus.READY && newJoinStatus == JoinStatus.DOING) {
+//            employeeProject.setJoinStatus(newJoinStatus);
+//            employeeProject.setJoinDate(LocalDate.now());
+//        }
+//        else if (previousJoinStatus == JoinStatus.DOING && newJoinStatus == JoinStatus.EXITED) {
+//            employeeProject.setJoinStatus(newJoinStatus);
+//            employeeProject.setExitDate(LocalDate.now());
+//        }
+//
+//        else if (previousJoinStatus == JoinStatus.EXITED && newJoinStatus == JoinStatus.DOING) {
+//            employeeProject.setJoinStatus(newJoinStatus);
+//            employeeProject.setExitDate(null);
+//        }
+//
+//        // 추가 논의 필요
+//        else if (previousJoinStatus == JoinStatus.DOING && newJoinStatus == JoinStatus.READY) {
+//            employeeProject.setJoinStatus(newJoinStatus);
+//            employeeProject.setJoinDate(null);
+//        }
+//        else if (previousJoinStatus == JoinStatus.READY && newJoinStatus == JoinStatus.EXITED) {
+//            employeeProject.setJoinStatus(newJoinStatus);
+//            employeeProject.setExitDate(null);
+//        }
+
 
 
         employeeProjectRepository.save(employeeProject);
     }
 
-    @Transactional
-    public void removeEmployeesFromProject(Long projectId, List<Long> employeeIds) {
+
+    public void changeEmployeeProjectRole(Long projectId, Long employeeId, EmployeeProjectChangeRoleRequest request) {
         if (!projectRepository.existsById(projectId)) {
             throw new IllegalArgumentException("Project with id " + projectId + " not found");
         }
-        for (Long employeeId : employeeIds) {
-            if (!employeeRepository.existsById(employeeId)) {
-                throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
-            }
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
+        }
+        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId).orElse(null);
+        if (employeeProject == null) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " is not assigned for project with id " + projectId);
         }
 
-        List<EmployeeProject> employeeProjects = employeeProjectRepository.findByProjectIdAndEmployeeIdIn(projectId, employeeIds);
+        employeeProject.setRole(request.getRole());
+        employeeProjectRepository.save(employeeProject);
+    }
 
-        if (employeeProjects.size() != employeeIds.size()) {
-            throw new IllegalArgumentException("Some EmployeeProjects not found");
+
+    @Transactional
+    public void removeEmployeesFromProject(Long projectId, Long employeeId) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new IllegalArgumentException("Project with id " + projectId + " not found");
+        }
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " not found");
         }
 
-        employeeProjectRepository.deleteAll(employeeProjects);
+        EmployeeProject employeeProject = employeeProjectRepository.findByProjectIdAndEmployeeId(projectId, employeeId).orElse(null);
+        if (employeeProject == null) {
+            throw new IllegalArgumentException("Employee with id " + employeeId + " is not assigned for project with id " + projectId);
+        }
+
+        if (employeeProject.getJoinStatus() == JoinStatus.DOING) {
+            throw new IllegalStateException(
+                    "Only READY, EXITED status employee can be removed from project.");
+        }
+
+
+        employeeProjectRepository.delete(employeeProject);
     }
 }

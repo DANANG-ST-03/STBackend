@@ -2,6 +2,7 @@ package danang03.STBackend.domain.projects;
 
 import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentResponse;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeJoinStatusRequest;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeRoleRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddResponse;
 import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
@@ -140,12 +141,26 @@ public class ProjectController {
         return ResponseEntity.ok(globalResponse);
     }
 
-    @DeleteMapping("/{projectId}/employee")
+    @PutMapping("/{projectId}/employee/{employeeId}/role")
+    public ResponseEntity<GlobalResponse> changeEmployeeRole(
+            @PathVariable Long projectId,
+            @PathVariable Long employeeId,
+            @RequestBody EmployeeProjectChangeRoleRequest request
+    ) {
+        projectService.changeEmployeeProjectRole(projectId, employeeId, request);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("EmployeeRole changed to " + request.getRole().toString() + " successfully")
+                .data(null).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
+    @DeleteMapping("/{projectId}/employee/{employeeId}")
     public ResponseEntity<GlobalResponse> removeEmployeesFromProject(
             @PathVariable Long projectId,
-            @RequestParam List<Long> employeeIds) {
+            @PathVariable Long employeeId) {
 
-        projectService.removeEmployeesFromProject(projectId, employeeIds);
+        projectService.removeEmployeesFromProject(projectId, employeeId);
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("Employee removed from project successfully")
