@@ -1,31 +1,114 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet" />
     <meta charset="UTF-8"/>
     <title>Resume</title>
     <style>
         body {
-            font-family: sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
-        .header {
-            background-color: #f2f2f2;
-            padding: 10px;
+
+        .container {
+            width: 595px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
         }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px; /* 사진/이름/직업 아래 간격 */
+        }
+
+        .profile-pic {
+            width: 133px;
+            height: 130px;
+            border: 1px solid black;
+            margin-right: 20px;
+        }
+
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info .name {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .profile-info .role {
+            font-size: 20px;
+            font-weight: 400;
+            margin: 5px 0 0 0;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
         .section-title {
-            font-weight: bold;
-            margin-top: 20px;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .section-content {
+            font-size: 10px;
+            font-weight: 400;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
-<div class="header">
-    <h1 th:text="${employeeDetail.getEmployeeInfo().getName()}">Name</h1>
-    <h3 th:text="${employeeDetail.getEmployeeInfo().getSkills()}">Skills</h3>
-</div>
-<div>
-    <span class="section-title">Contact</span>
-    <p>email: <span th:text="${employeeDetail.employeeInfo.email}">example@example.com</span></p>
-    <p>연락처: <span th:text="${employeeDetail.employeeInfo.contact}">777-777-7777</span></p>
+<div class="container">
+    <!-- 사진, 이름, 직업 -->
+    <div class="profile">
+        <div class="profile-pic">
+            <img th:src="@{${employeeDetail.employeeInfo.imageUrl}}" alt="Profile Picture"/>
+        </div>
+        <div class="profile-info">
+            <p class="name" th:text="${employeeDetail.employeeInfo.name}">Your Name</p>
+            <p class="role" th:text="${employeeDetail.employeeInfo.role}">Backend Developer</p>
+        </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 30px;">
+        <!-- 스킬 -->
+        <div class="section skills">
+            <div class="section-title">Skill Stack</div>
+            <div class="section-content" th:text="${employeeDetail.employeeInfo.skills}">
+                My, Very, many many, Skills
+            </div>
+        </div>
+
+        <!-- 연락처 -->
+        <div class="section contact">
+            <div class="section-title">Contact</div>
+            <div class="section-content">
+                <div>Phone: <span th:text="${employeeDetail.employeeInfo.contact}">+123-456-7890</span></div>
+                <div>Email: <span th:text="${employeeDetail.employeeInfo.email}">email@email.com</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 프로젝트 -->
+    <div class="section projects">
+        <div class="section-title">Work Experience</div>
+        <div class="section-content" th:each="project : ${employeeDetail.projectsInfo}">
+            <div th:text="${project.projectInfo.name}">Project Name</div>
+            <div th:text="${#dates.format(project.employeeProjectInfo.joinDate, 'yyyy.MM')} + '-' + ${#dates.format(project.employeeProjectInfo.exitDate, 'yyyy.MM')}">
+                2025.01-2025.02
+            </div>
+            <div th:text="${project.employeeProjectInfo.roleInProject}">Role</div>
+        </div>
+    </div>
 </div>
 </body>
 </html>
