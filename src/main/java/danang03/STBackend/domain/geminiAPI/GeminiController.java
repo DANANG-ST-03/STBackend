@@ -1,7 +1,9 @@
 package danang03.STBackend.domain.geminiAPI;
 
+import danang03.STBackend.dto.GlobalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.instrument.classloading.glassfish.GlassFishLoadTimeWeaver;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -15,7 +17,7 @@ public class GeminiController {
         this.geminiService = geminiService;
     }
     @PostMapping("/process-query")
-    public ResponseEntity<String> processQuery(
+    public ResponseEntity<GlobalResponse> processQuery(
             @RequestHeader("Session-ID") String sessionId,
             @RequestBody String naturalLanguagePrompt) {
         // Add input to session history
@@ -25,18 +27,31 @@ public class GeminiController {
         String response = geminiService.processNaturalLanguageQuery(naturalLanguagePrompt, sessionId);
         geminiService.addToSessionHistory(sessionId, response);
 
-        return ResponseEntity.ok(response);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("process query good~")
+                .data(response).build();
+        return ResponseEntity.ok(globalResponse);
     }
 
     @GetMapping("/session-history")
-    public ResponseEntity<List<String>> getSessionHistory(@RequestHeader("Session-ID") String sessionId) {
-        return ResponseEntity.ok(geminiService.getSessionHistory(sessionId));
+    public ResponseEntity<GlobalResponse> getSessionHistory(@RequestHeader("Session-ID") String sessionId) {
+        List<String> result = geminiService.getSessionHistory(sessionId);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("history get gooddd")
+                .data(result).build();
+        return ResponseEntity.ok(globalResponse);
     }
 
     @DeleteMapping("/session-history")
-    public ResponseEntity<Void> clearSessionHistory(@RequestHeader("Session-ID") String sessionId) {
+    public ResponseEntity<GlobalResponse> clearSessionHistory(@RequestHeader("Session-ID") String sessionId) {
         geminiService.clearSessionHistory(sessionId);
-        return ResponseEntity.noContent().build();
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("history delete gooddd")
+                .data(null).build();
+        return ResponseEntity.ok(globalResponse);
     }
 }
 
