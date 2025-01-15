@@ -45,8 +45,13 @@ public class EmployeeService {
             throw new IllegalArgumentException("Employee with the same email already exists");
         }
 
+        String name = request.getName();
+        String firstName = name.split(" ")[0];
+        String lastName = name.split(" ")[1];
         Employee employee = Employee.builder()
-                .name(request.getName())
+                .name(name)
+                .firstName(firstName)
+                .lastName(lastName)
                 .email(request.getEmail())
                 .contact(request.getContact())
                 .skills(request.getSkills())
