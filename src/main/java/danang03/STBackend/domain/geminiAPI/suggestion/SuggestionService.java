@@ -40,11 +40,20 @@ public class SuggestionService {
 
         // Simple keyword-based suggestions
         if (!input.isBlank()) {
-            suggestions.add("Search for '" + input + "' in all employee records.");
-            suggestions.add("List all projects containing '" + input + "'.");
-            suggestions.add("Find people with the skill of '" + input + "'.");
+            if (input.equalsIgnoreCase("What")) {
+                suggestions.add("What is the phone number of ");
+                suggestions.add("What is the email of ");
+                suggestions.add("What projects are currently pending?");
+            } else if (input.equalsIgnoreCase("Who")) {
+                suggestions.add("Who is managing the project?");
+                suggestions.add("Who has skills in ");
+                suggestions.add("Who is currently assigned to the project?");
+            } else {
+                suggestions.add("Search for '" + input + "' in all employee records.");
+                suggestions.add("List all projects containing '" + input + "'.");
+                suggestions.add("Find people with the skill of '" + input + "'.");
+            }
         }
-
         return suggestions;
     }
 }

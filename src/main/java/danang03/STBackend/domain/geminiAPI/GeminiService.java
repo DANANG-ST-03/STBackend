@@ -85,17 +85,26 @@ public class GeminiService {
             schemaCache = getAllTableSchemas();
         }
     }
-    public String generateSQLFromPrompt(String naturalLanguagePrompt) {
+
+    public String generateSQLFromPrompt(String naturalLanguagePrompt, List<String> recentHistory) {
         initializeSchemaCache();
         StringBuilder schemaBuilder = new StringBuilder("Based on the following table schemas:\n\n");
         for (String schema : schemaCache) {
             schemaBuilder.append(schema).append("\n\n");
         }
 
+        StringBuilder historyContext = new StringBuilder("Refer to the session history for additional context:\n");
+        for (String historyItem : recentHistory) {
+            historyContext.append(historyItem).append("\n");
+        }
+
         String fullPrompt = schemaBuilder.toString() +
-                "Make sure to handle case insensitivity by using LOWER() or ILIKE for text matching. " +
-                "Also, refer to the session history to provide context when generating the SQL query. " +
-                "Convert the following natural language prompt into an SQL query. Don't include opinion, just sql:\n" +
+                historyContext +
+                "Use LOWER() or ILIKE for case-insensitive matching. " +
+                "Focus on the most recent history. " +
+                "If the query includes a person's name, handle it as an employee. " +
+                "If it includes a project name, handle it as a project. " +
+                "Otherwise, generate only the SQL query without opinions:\n" +
                 naturalLanguagePrompt;
 
         GeminiRequest request = new GeminiRequest(fullPrompt);
@@ -157,6 +166,39 @@ public class GeminiService {
         // Retrieve session history
         List<String> history = getSessionHistory(sessionId);
 
+        // Focus on the most recent 3 history items
+        List<String> recentHistory = history.subList(Math.max(history.size() - 3, 0), history.size());
+
+        // Combine history with the current prompt
+        StringBuilder promptBuilder = new StringBuilder("Session History:\n");
+        for (String pastInput : recentHistory) {
+            promptBuilder.append(pastInput).append("\n");
+        }
+        promptBuilder.append("Current Query: ").append(naturalLanguagePrompt);
+
+        String rawSQLQuery = generateSQLFromPrompt(naturalLanguagePrompt, recentHistory);
+        String sanitizedSQLQuery = sanitizeSQLQuery(rawSQLQuery);
+        System.out.println(rawSQLQuery);
+        List<Map<String, Object>> queryResults;
+
+        try {
+            queryResults = executeSQLQuery(sanitizedSQLQuery);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+
+        if (queryResults.isEmpty()) {
+            return "No data found";
+        }
+
+        return generateNaturalLanguageFromResults(queryResults);
+    }
+    /*
+
+        public String processNaturalLanguageQuery(String naturalLanguagePrompt, String sessionId) {
+        // Retrieve session history
+        List<String> history = getSessionHistory(sessionId);
+
         // Combine history with the current prompt
         StringBuilder promptBuilder = new StringBuilder("Session History:\n");
         for (String pastInput : history) {
@@ -183,5 +225,5 @@ public class GeminiService {
         }
 
         return generateNaturalLanguageFromResults(queryResults);
-    }
+    }*/
 }
