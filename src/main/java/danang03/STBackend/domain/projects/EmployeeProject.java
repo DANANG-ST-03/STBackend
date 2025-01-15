@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
@@ -61,13 +62,17 @@ public class EmployeeProject {
         this.joinStatus = JoinStatus.READY;
     }
 
+    @RequiredArgsConstructor
+    @Getter
     public enum Role {
-        TEAM_LEADER,
-        DESIGNER,
-        FE_DEVELOPER,
-        BE_DEVELOPER,
-        AI_ENGINEER,
-        TESTER
+        TEAM_LEADER("Team Reader"),
+        DESIGNER("Designer"),
+        FE_DEVELOPER("Frontend Developer"),
+        BE_DEVELOPER("Backend Developer"),
+        AI_ENGINEER("AI Engineer"),
+        TESTER("Tester");
+
+        private final String displayText;
     }
 
     public enum JoinStatus {

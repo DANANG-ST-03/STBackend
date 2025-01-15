@@ -3,6 +3,7 @@ package danang03.STBackend.domain.geminiAPI;
 import danang03.STBackend.dto.GlobalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.instrument.classloading.glassfish.GlassFishLoadTimeWeaver;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -28,18 +29,18 @@ public class GeminiController {
 
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
-                .message("successfully got answer from gemini")
+                .message("process query good~")
                 .data(response).build();
         return ResponseEntity.ok(globalResponse);
     }
 
     @GetMapping("/session-history")
     public ResponseEntity<GlobalResponse> getSessionHistory(@RequestHeader("Session-ID") String sessionId) {
-        List<String> sessionHistory = geminiService.getSessionHistory(sessionId);
+        List<String> result = geminiService.getSessionHistory(sessionId);
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
-                .message("successfully got session history")
-                .data(sessionHistory).build();
+                .message("history get gooddd")
+                .data(result).build();
         return ResponseEntity.ok(globalResponse);
     }
 
@@ -48,7 +49,7 @@ public class GeminiController {
         geminiService.clearSessionHistory(sessionId);
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
-                .message("deleted session history")
+                .message("history delete gooddd")
                 .data(null).build();
         return ResponseEntity.ok(globalResponse);
     }
