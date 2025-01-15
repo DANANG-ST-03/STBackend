@@ -52,7 +52,8 @@ public class EmployeeService {
             firstName = name.split(" ")[0];
             lastName = name.split(" ")[1];
         } else {
-            firstName = lastName = null;
+            firstName = name;
+            lastName = null;
         }
         Employee employee = Employee.builder()
                 .name(name)
