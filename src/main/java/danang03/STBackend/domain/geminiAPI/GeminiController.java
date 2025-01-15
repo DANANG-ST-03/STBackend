@@ -23,6 +23,7 @@ public class GeminiController {
 
         // Process the query
         String response = geminiService.processNaturalLanguageQuery(naturalLanguagePrompt, sessionId);
+        geminiService.addToSessionHistory(sessionId, response);
 
         return ResponseEntity.ok(response);
     }
@@ -37,12 +38,5 @@ public class GeminiController {
         geminiService.clearSessionHistory(sessionId);
         return ResponseEntity.noContent().build();
     }
-    /*
-    @PostMapping("/process-query")
-    public ResponseEntity<String> processQuery(@RequestBody String naturalLanguagePrompt) {
-        String response = geminiService.processNaturalLanguageQuery(naturalLanguagePrompt);
-        return ResponseEntity.ok(response);
-    }*/
-
 }
 
