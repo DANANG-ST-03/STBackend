@@ -64,24 +64,26 @@
         </div>
     </div>
 
-    <!-- 구분선 -->
-    <hr class="divider" />
 
     <!-- Work Experience -->
     <h3>Work Experience</h3>
-<!--    <p th:text="${#dates.format(T(java.time.LocalDate).now(), 'yyyy.MM')}"></p>-->
 
-    <div th:each="project : ${employeeDetail.projectsInfo}">
+    <div th:each="project : ${employeeDetail.projectsInfo}" style="margin-bottom: 10px">
+        <hr class="divider" />
+        <!-- 프로젝트 이름 및 날짜 -->
         <p>
-            <span style="font-weight: bold" th:text="${project.projectInfo.name}">Project Name</span> |
+            <span style="font-weight: bold" th:text="${project.projectInfo.name}">Project Name</span>  |
             <span th:text="${project.employeeProjectInfo.joinDate != null ? #temporals.format(project.employeeProjectInfo.joinDate, 'yyyy.MM') : 'N/A'}">2025.01</span> -
             <span th:text="${project.employeeProjectInfo.exitDate != null ? #temporals.format(project.employeeProjectInfo.exitDate, 'yyyy.MM') : 'N/A'}">2025.02</span>
         </p>
-        <p th:text="${project.employeeProjectInfo.roleInProject}">Role</p>
-        <p th:text="${project.employeeProjectInfo.contribution}">my contribution</p>
-    </div>
 
-    <hr class="divider" />
+        <!-- 역할과 기여도 -->
+        <div style="margin-left: 20px;" >
+            <p th:text="${project.employeeProjectInfo.roleInProject.getDisplayText()}">Role</p>
+            <p th:text="${project.employeeProjectInfo.contribution}" style="margin-left: 20px;">my contribution</p>
+        </div>
+
+    </div>
 </div>
 </body>
 </html>
