@@ -46,8 +46,14 @@ public class EmployeeService {
         }
 
         String name = request.getName();
-        String firstName = name.split(" ")[0];
-        String lastName = name.split(" ")[1];
+        String firstName;
+        String lastName;
+        if (name.contains(" ")) {
+            firstName = name.split(" ")[0];
+            lastName = name.split(" ")[1];
+        } else {
+            firstName = lastName = null;
+        }
         Employee employee = Employee.builder()
                 .name(name)
                 .firstName(firstName)
