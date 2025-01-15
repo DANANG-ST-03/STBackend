@@ -75,9 +75,27 @@ public class EmployeeService {
                 .imageUrl(employee.getImageUrl()).build();
     }
 
-    public List<EmployeeSimpleResponse> getAllEmployeesSimple() {
-        return  employeeRepository.findAll()
-                .stream().map(employee -> new EmployeeSimpleResponse(
+    public List<EmployeeSimpleResponse> getAllEmployeesSimple(Long projectId) {
+        List<Employee> allEmployees = employeeRepository.findAll();
+        if (projectId == null) {
+            return allEmployees.stream()
+                    .map(employee -> new EmployeeSimpleResponse(
+                            employee.getId(),
+                            employee.getName(),
+                            employee.getImageUrl())
+                    ).toList();
+        }
+
+        List<Employee> assignedEmployees = employeeProjectRepository.findByProjectId(projectId).stream()
+                .map(EmployeeProject::getEmployee).toList();
+
+        List<Employee> notAssignedEmployees = allEmployees.stream()
+                .filter(employee -> !assignedEmployees.contains(employee))
+                .toList();
+
+        // 프로젝트에 할당되지 않은 유저들만 필터링
+        return notAssignedEmployees.stream()
+                .map(employee -> new EmployeeSimpleResponse(
                         employee.getId(),
                         employee.getName(),
                         employee.getImageUrl())

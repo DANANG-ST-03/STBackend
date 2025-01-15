@@ -9,25 +9,18 @@ import danang03.STBackend.domain.employee.dto.EmployeeResponse;
 import danang03.STBackend.domain.employee.dto.EmployeeSimpleResponse;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeRequest;
 import danang03.STBackend.domain.employee.dto.UpdateEmployeeResponse;
-import danang03.STBackend.domain.image.S3Service;
 import danang03.STBackend.dto.GlobalResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -93,8 +86,8 @@ public class EmployeeController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<GlobalResponse> getAllEmployees() {
-        List<EmployeeSimpleResponse> responses = employeeService.getAllEmployeesSimple();
+    public ResponseEntity<GlobalResponse> getAllEmployeesSimple(@RequestParam(required = false) Long projectId) {
+        List<EmployeeSimpleResponse> responses = employeeService.getAllEmployeesSimple(projectId);
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("get Employees success")
