@@ -133,7 +133,8 @@ public class EmployeeService {
                     return new ProjectResponseForEmployeeDetail(projectResponse, employeeProjectResponse);
                 })
                 .sorted(Comparator.comparing(
-                        element -> element.getProjectInfo().getStartDate()
+                        element -> element.getProjectInfo().getStartDate(),
+                        Comparator.nullsLast(Comparator.naturalOrder())
                 ))
                 .toList();
         return new EmployeeDetailResponse(employeeResponse, projectResponses);
