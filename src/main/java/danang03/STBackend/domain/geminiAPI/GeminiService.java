@@ -87,7 +87,7 @@ public class GeminiService {
         return schemas;
     }
 
-// Processes a natural language query, incorporating session history and generating a SQL query
+    // Processes a natural language query, incorporating session history and generating a SQL query
     public String processNaturalLanguageQuery(String naturalLanguagePrompt, String sessionId) {
         // Retrieve session history
         List<String> history = getSessionHistory(sessionId);
@@ -100,24 +100,33 @@ public class GeminiService {
         for (String pastInput : recentHistory) {
             promptBuilder.append(pastInput).append("\n");
         }
-        promptBuilder.append("Current Query: ").append(naturalLanguagePrompt);
+        promptBuilder.append("Current Query: ").append(naturalLanguagePrompt).append("\n\n");
 
-        String rawSQLQuery = generateSQLFromPrompt(naturalLanguagePrompt, recentHistory);
-        String sanitizedSQLQuery = sanitizeSQLQuery(rawSQLQuery);
-        System.out.println(rawSQLQuery);
-        List<Map<String, Object>> queryResults;
+        promptBuilder.append("Instructions: You are HR Buddy, a virtual assistant to help find information about employees or projects in ST United.\n");
+        promptBuilder.append("1. If the input involves a name or project, generate a precise SQL query to retrieve relevant data.\n");
+        promptBuilder.append("2. If the input is a general greeting (e.g., 'hello'), respond conversationally without SQL.\n");
+        promptBuilder.append("3. Use case-insensitive matching (LOWER or ILIKE) for names or project searches.\n");
+        promptBuilder.append("4. Avoid assumptions and respond clearly and concisely, without rephrasing the input unnecessarily.\n");
 
-        try {
-            queryResults = executeSQLQuery(sanitizedSQLQuery);
-        } catch (Exception e) {
-            return e.getMessage();
+        String generatedResponse = generateSQLFromPrompt(String.valueOf(promptBuilder), history);
+
+        // If SQL is generated, execute it and return the results
+        if (generatedResponse.contains("SELECT")) {
+            String rawSQLQuery = sanitizeSQLQuery(generatedResponse);
+            System.out.println("rawSQLQuery: \n" +rawSQLQuery);
+            try {
+                List<Map<String, Object>> queryResults = executeSQLQuery(rawSQLQuery);
+                if (queryResults.isEmpty()) {
+                    return "No data found.";
+                }
+                return generateNaturalLanguageFromResults(queryResults);
+            } catch (Exception e) {
+                return e.getMessage();
+            }
         }
 
-        if (queryResults.isEmpty()) {
-            return "No data found";
-        }
-
-        return generateNaturalLanguageFromResults(queryResults);
+        // If no SQL is generated, return the conversational response
+        return generatedResponse;
     }
 
     // Generates an SQL query from a natural language prompt and recent session history
@@ -134,13 +143,7 @@ public class GeminiService {
         }
 
         String fullPrompt = schemaBuilder.toString() +
-                historyContext +
-                "Use LOWER() or ILIKE for case-insensitive matching. " +
-                "Focus on the most recent history. " +
-                "If the query includes a person's name, handle it as an employee. " +
-                "If it includes a project name, handle it as a project. " +
-                "Otherwise, generate only the SQL query without opinions:\n" +
-                naturalLanguagePrompt;
+                historyContext + naturalLanguagePrompt;
 
         GeminiRequest request = new GeminiRequest(fullPrompt);
         System.out.println(request);
@@ -149,7 +152,7 @@ public class GeminiService {
         return response.getCandidates().stream()
                 .findFirst()
                 .map(candidate -> candidate.getContent().getParts().get(0).getText())
-                .orElse("No SQL query generated");
+                .orElse("");
     }
 
     // Remove Markdown-style code block syntax from the SQL query
@@ -178,13 +181,11 @@ public class GeminiService {
         }
 
         StringBuilder resultsBuilder = new StringBuilder(
-                "Process the provided data as-is and convert it into natural language by listing the values clearly. " +
+                "Process the provided data as-is and convert it into user-friendly language(ex. don't use word 'query') by listing the values clearly. " +
                         "For example:\n" +
                         "{name=Alexander Jade}\\n{name=Alice Brown} should be transformed into Alexander Jade, Alice Brown.\n" +
                         "{name=Website Revamp, description=Complete redesign of the company website}\\The project 'Website Revamp' involves a complete redesign of the company website.\n" +
-                        "While avoiding assumptions or unrelated information, you may adjust the sentence structure. " +
-                        "Speak in user-friendly language.\n\n"
-
+                        "While avoiding assumptions or unrelated information, you may adjust the sentence structure. "
         );
         for (Map<String, Object> row : queryResults) {
             resultsBuilder.append(row.toString()).append("\n");
