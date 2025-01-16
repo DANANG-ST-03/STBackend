@@ -98,8 +98,8 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<GlobalResponse> getEmployeesByPage(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Pageable pageable) {
+            @RequestParam(defaultValue = "10") int size
+    ) {
         Page<EmployeeResponse> employees = employeeService.getEmployeesByPage(PageRequest.of(page, size));
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
@@ -107,6 +107,22 @@ public class EmployeeController {
                 .data(employees).build();
         return ResponseEntity.ok(globalResponse);
     }
+
+
+    @GetMapping("/search")
+    public ResponseEntity<GlobalResponse> searchEmployeesByPage(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<EmployeeResponse> searchedEmployees = employeeService.searchEmployeesByPage(keyword, PageRequest.of(page, size));
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("searched Employees success")
+                .data(searchedEmployees).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
 
     @PutMapping("{id}")
     public ResponseEntity<GlobalResponse> updateEmployee(@PathVariable Long id, @RequestBody UpdateEmployeeRequest request) {

@@ -16,12 +16,12 @@ import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -174,6 +174,37 @@ public class EmployeeService {
                         .joiningDate(employee.getJoiningDate())
                         .role(employee.getRole())
                         .imageUrl(employee.getImageUrl()).build());
+    }
+
+
+    public Page<EmployeeResponse> searchEmployeesByPage(String keyword, Pageable pageable) {
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(
+                        Sort.Order.asc("name"),
+                        Sort.Order.desc("id")
+                )
+        );
+
+        Page<Employee> employees = employeeRepository.searchByKeyword(keyword, sortedPageable);
+
+        List<EmployeeResponse> employeeResponses = employees.getContent().stream()
+                .map(employee -> EmployeeResponse.builder()
+                        .id(employee.getId())
+                        .name(employee.getName())
+                        .firstName(employee.getFirstName())
+                        .lastName(employee.getLastName())
+                        .email(employee.getEmail())
+                        .contact(employee.getContact())
+                        .skills(employee.getSkills())
+                        .joiningDate(employee.getJoiningDate())
+                        .role(employee.getRole())
+                        .imageUrl(employee.getImageUrl()).build()
+                ).toList();
+
+        return new PageImpl<>(employeeResponses, pageable, employees.getTotalElements());
+
     }
 
 
