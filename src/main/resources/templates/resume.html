@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet" />
+    <meta charset="UTF-8"/>
+    <title>Resume</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 595px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            page-break-inside: avoid; /* PDF 변환 시 요소가 잘리지 않도록 설정 */
+        }
+
+        .flex-container {
+            display: table; /* Flex 대신 Table로 변경 */
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .flex-item {
+            display: table-cell; /* 각 요소를 셀로 처리 */
+            vertical-align: top;
+            padding: 0 15px; /* 간격 조정 */
+        }
+
+        .divider {
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 프로필 섹션 -->
+    <div class="flex-container">
+        <div class="flex-item">
+            <img th:src="@{${employeeDetail.employeeInfo.imageUrl}}" alt="Profile Picture" style="width: 133px; height: 130px; border: 1px solid black;" />
+        </div>
+        <div class="flex-item">
+            <h1 th:text="${employeeDetail.employeeInfo.name}">Your Name</h1>
+            <p th:text="${employeeDetail.employeeInfo.role}">Backend Developer</p>
+        </div>
+    </div>
+
+    <!-- 스킬 및 연락처 -->
+    <div class="flex-container">
+        <div class="flex-item">
+            <h3>Skill Stack</h3>
+            <p th:text="${employeeDetail.employeeInfo.skills}">My, Very, many many, Skills</p>
+        </div>
+        <div class="flex-item">
+            <h3>Contact</h3>
+            <p>Phone: <span th:text="${employeeDetail.employeeInfo.contact}">+123-456-7890</span></p>
+            <p>Email: <span th:text="${employeeDetail.employeeInfo.email}">email@email.com</span></p>
+        </div>
+    </div>
+
+
+    <!-- Work Experience -->
+    <h3>Work Experience</h3>
+
+    <div th:each="project : ${employeeDetail.projectsInfo}" style="margin-bottom: 10px">
+        <hr class="divider" />
+        <!-- 프로젝트 이름 및 날짜 -->
+        <p>
+            <span style="font-weight: bold" th:text="${project.projectInfo.name}">Project Name</span>  |
+            <span th:text="${project.employeeProjectInfo.joinDate != null ? #temporals.format(project.employeeProjectInfo.joinDate, 'yyyy.MM') : 'N/A'}">2025.01</span> -
+            <span th:text="${project.employeeProjectInfo.exitDate != null ? #temporals.format(project.employeeProjectInfo.exitDate, 'yyyy.MM') : 'N/A'}">2025.02</span>
+        </p>
+
+        <!-- 역할과 기여도 -->
+        <div style="margin-left: 20px;" >
+            <p th:text="${project.employeeProjectInfo.roleInProject.getDisplayText()}">Role</p>
+            <p th:text="${project.employeeProjectInfo.contribution}" style="margin-left: 20px;">my contribution</p>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

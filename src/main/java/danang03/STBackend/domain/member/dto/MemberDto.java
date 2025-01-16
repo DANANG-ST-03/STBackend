@@ -14,5 +14,5 @@ public class MemberDto {
     private String name;
     private String username;
     private String email;
-    private String picture;
+//    private String picture;
 }

@@ -63,6 +63,14 @@ dependencies {
 	// aws parameter store
 //	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameterstore-config:3.0.1'
 //	implementation 'io.awspring.cloud:spring-cloud-aws-starter:2.4.3'
+
+
+	// thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.4.RELEASE'
+	// to pdf
+	implementation 'org.xhtmlrenderer:flying-saucer-core:9.1.22'
+	implementation 'org.xhtmlrenderer:flying-saucer-pdf-openpdf:9.1.22'
 }
 
 tasks.named('test') {

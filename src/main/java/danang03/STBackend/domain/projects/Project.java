@@ -50,16 +50,12 @@ public class Project {
     private List<EmployeeProject> employeeProjects = new ArrayList<>();
 
 
-    public Project(String name, String description, ProjectStatus status) {
+    public Project(String name, String description) {
         this.name = name;
         this.description = description;
         this.startDate = null;
         this.endDate = null;
-        this.status = status;
-
-        if (status == ProjectStatus.WORKING) {
-            startDate = LocalDate.now();
-        }
+        this.status = ProjectStatus.PENDING;
     }
 
     // 업데이트를 위한 메서드

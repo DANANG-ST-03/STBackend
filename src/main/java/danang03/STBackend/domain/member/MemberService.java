@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -93,8 +92,8 @@ public class MemberService {
                         member.getId(),
                         member.getName(),
                         member.getUsername(),
-                        member.getEmail(),
-                        member.getPicture()
+                        member.getEmail()
+//                        member.getImageUrl()
                 ));
     }
     public Page<Member> getMembers(Pageable pageable) {

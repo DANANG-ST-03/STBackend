@@ -1,7 +1,6 @@
 package danang03.STBackend.domain.employee;
 
 import danang03.STBackend.domain.projects.EmployeeProject;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,8 +27,8 @@ public class Employee {
 
     @Column(nullable = false)
     private String name;
-    private String first_name;
-    private String last_name;
+    private String firstName;
+    private String lastName;
 
     @Column(nullable = false, unique = true)
     private String email;

@@ -10,6 +10,8 @@ import lombok.Getter;
 public class EmployeeResponse {
     private Long id;
     private String name;
+    private String firstName;
+    private String lastName;
     private String email;
     private String contact;
     private String skills;
