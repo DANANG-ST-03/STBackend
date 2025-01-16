@@ -5,6 +5,7 @@ import danang03.STBackend.config.auth.dto.JwtToken;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
 import danang03.STBackend.domain.member.dto.PasswordChangeRequest;
 import danang03.STBackend.domain.member.dto.MemberResponse;
+import danang03.STBackend.domain.member.dto.PasswordResetResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.lang3.RandomStringUtils;
+
 
 @RequiredArgsConstructor
 @Service
@@ -130,5 +133,26 @@ public class MemberService {
         // 새 비밀번호 암호화 후 저장
         member.setPassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
+    }
+
+
+    @Transactional
+    public PasswordResetResponse resetPassword(Long memberId) {
+        // memberId로 사용자 찾기
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("cannot find member with id: " + memberId));
+
+        String newPassword =  RandomStringUtils.randomAlphanumeric(8);
+        // 새 비밀번호 암호화 후 저장
+        member.setPassword(passwordEncoder.encode(newPassword));
+        memberRepository.save(member);
+
+        PasswordResetResponse passwordResetResponse = new PasswordResetResponse(
+                newPassword,
+                memberId,
+                member.getName(),
+                member.getEmail()
+        );
+        return passwordResetResponse;
     }
 }
