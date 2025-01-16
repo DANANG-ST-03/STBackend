@@ -8,6 +8,7 @@ import danang03.STBackend.config.auth.dto.SigninRequest;
 import danang03.STBackend.domain.member.Member;
 import danang03.STBackend.domain.member.MemberRepository;
 import danang03.STBackend.domain.member.MemberService;
+import danang03.STBackend.domain.member.Role;
 import danang03.STBackend.dto.GlobalResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -106,6 +107,7 @@ public class AuthController {
                     member.getId(),
                     member.getName(),
                     member.getEmail(),
+                    member.getRole(),
                     jwtToken);
             GlobalResponse globalResponse = GlobalResponse.builder()
                     .status(200)
