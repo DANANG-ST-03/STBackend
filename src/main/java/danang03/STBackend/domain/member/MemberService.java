@@ -3,8 +3,7 @@ package danang03.STBackend.domain.member;
 import danang03.STBackend.config.auth.JwtTokenProvider;
 import danang03.STBackend.config.auth.dto.JwtToken;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
-import danang03.STBackend.domain.employee.dto.EmployeeResponse;
-import danang03.STBackend.domain.member.dto.ChangePasswordRequest;
+import danang03.STBackend.domain.member.dto.PasswordChangeRequest;
 import danang03.STBackend.domain.member.dto.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -112,7 +111,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void changePassword(ChangePasswordRequest request) {
+    public void changePassword(PasswordChangeRequest request) {
         String oldPassword = request.getOldPassword();
         String newPassword = request.getNewPassword();
 

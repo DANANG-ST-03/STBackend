@@ -1,7 +1,7 @@
 package danang03.STBackend.domain.member;
 
 
-import danang03.STBackend.domain.member.dto.ChangePasswordRequest;
+import danang03.STBackend.domain.member.dto.PasswordChangeRequest;
 import danang03.STBackend.domain.member.dto.MemberResponse;
 import danang03.STBackend.dto.GlobalResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class MemberController {
     }
 
     @PatchMapping("/password")
-    public ResponseEntity<GlobalResponse> changePassword(@RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<GlobalResponse> changePassword(@RequestBody PasswordChangeRequest request) {
         memberService.changePassword(request);
 
         GlobalResponse globalResponse = GlobalResponse.builder()
