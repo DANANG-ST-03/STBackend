@@ -98,7 +98,6 @@ public class MemberService {
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by(
-                        Sort.Order.desc("joiningDate"), // startDate 기준 내림차순, null은 마지막
                         Sort.Order.asc("id")
                 )
         );
