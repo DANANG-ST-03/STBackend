@@ -12,6 +12,6 @@ import java.util.List;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     boolean existsByEmail(String email);
 
-    @Query("SELECT e.name FROM Employee e WHERE e.name LIKE %:input%")
+    @Query("SELECT e.name FROM Employee e WHERE LOWER(e.name) LIKE LOWER(CONCAT('%', :input, '%'))")
     List<String> findNamesStartingWith(@Param("input") String input, Pageable limit);
 }
