@@ -3,12 +3,15 @@ package danang03.STBackend.domain.member;
 import danang03.STBackend.config.auth.JwtTokenProvider;
 import danang03.STBackend.config.auth.dto.JwtToken;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
-import danang03.STBackend.domain.member.dto.MemberDto;
+import danang03.STBackend.domain.employee.dto.EmployeeResponse;
+import danang03.STBackend.domain.member.dto.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -86,17 +89,23 @@ public class MemberService {
         }
     }
 
-    public Page<MemberDto> getMembersDto(Pageable pageable) {
+    public Page<MemberResponse> getMembersByPage(Pageable pageable) {
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(
+                        Sort.Order.desc("joiningDate"), // startDate 기준 내림차순, null은 마지막
+                        Sort.Order.asc("id")
+                )
+        );
+
         return memberRepository.findAll(pageable)
-                .map(member -> new MemberDto(
+                .map(member -> new MemberResponse(
                         member.getId(),
                         member.getName(),
                         member.getUsername(),
-                        member.getEmail()
-//                        member.getImageUrl()
+                        member.getEmail(),
+                        member.getRole()
                 ));
-    }
-    public Page<Member> getMembers(Pageable pageable) {
-        return memberRepository.findAll(pageable);
     }
 }
