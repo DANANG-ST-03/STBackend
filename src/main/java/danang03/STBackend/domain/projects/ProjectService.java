@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -106,7 +107,7 @@ public class ProjectService {
                 pageable.getPageSize(),
                 Sort.by(
                         Sort.Order.desc("startDate"), // startDate 기준 내림차순
-                        Sort.Order.asc("id")                     // id 기준 오름차순
+                        Sort.Order.asc("id")          // id 기준 오름차순
                 )
         );
 
@@ -120,6 +121,32 @@ public class ProjectService {
                         project.getStatus()
                 ));
     }
+
+
+    public Page<ProjectResponse> searchProjectsByPage(String keyword, Pageable pageable) {
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(
+                        Sort.Order.asc("name"),
+                        Sort.Order.desc("id")
+                )
+        );
+
+        Page<Project> projects = projectRepository.searchByKeyword(keyword, sortedPageable);
+
+        List<ProjectResponse> projectResponses = projects.getContent().stream()
+                .map(project -> ProjectResponse.builder()
+                        .id(project.getId())
+                        .name(project.getDescription())
+                        .startDate(project.getStartDate())
+                        .endDate(project.getEndDate())
+                        .status(project.getStatus()).build()
+                ).toList();
+
+        return new PageImpl<>(projectResponses, pageable, projects.getTotalElements());
+    }
+
 
 
     @Transactional

@@ -17,7 +17,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<String> findNamesStartingWith(@Param("input") String input, Pageable limit);
 
 
-    // 검색용
+    // for search
     @Query("SELECT e FROM Employee e WHERE LOWER(e.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(e.role) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(e.email) LIKE LOWER(CONCAT('%', :keyword, '%'))")

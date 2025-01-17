@@ -102,7 +102,7 @@ public class MemberService {
                 )
         );
 
-        return memberRepository.findAll(pageable)
+        return memberRepository.findAll(sortedPageable)
                 .map(member -> new MemberResponse(
                         member.getId(),
                         member.getName(),

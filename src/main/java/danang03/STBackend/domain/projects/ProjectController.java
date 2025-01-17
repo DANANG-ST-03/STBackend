@@ -80,6 +80,23 @@ public class ProjectController {
         return ResponseEntity.ok(globalResponse);
     }
 
+
+    @GetMapping("/search")
+    public ResponseEntity<GlobalResponse> searchProjectsByPage(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<ProjectResponse> searchedEmployees = projectService.searchProjectsByPage(keyword, PageRequest.of(page, size));
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("searched projects success")
+                .data(searchedEmployees).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
+
+
     @PutMapping("/{id}")
     public ResponseEntity<GlobalResponse> updateProject(@PathVariable Long id, @RequestBody ProjectUpdateRequest request) {
         projectService.updateProject(id, request);
@@ -105,6 +122,9 @@ public class ProjectController {
         log.info("Delete project successfully");
         return ResponseEntity.ok(globalResponse);
     }
+
+
+
 
 
     // 프로젝트에 직원을 배정
