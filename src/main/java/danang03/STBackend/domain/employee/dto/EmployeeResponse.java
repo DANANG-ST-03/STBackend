@@ -1,5 +1,7 @@
 package danang03.STBackend.domain.employee.dto;
+import danang03.STBackend.domain.employee.Skill;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +16,7 @@ public class EmployeeResponse {
     private String lastName;
     private String email;
     private String contact;
-    private String skills;
+    private List<Skill> skills;
     private LocalDate joiningDate;
     private String role;
     private String imageUrl;
