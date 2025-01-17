@@ -2,67 +2,67 @@ package danang03.STBackend.domain.employee;
 
 public enum Skill {
     // Backend
-    JAVA, SPRING_BOOT, SPRING, NODE_JS, EXPRESS, KOTLIN, C_SHARP, DOTNET, GO, RUST,
-    PYTHON, DJANGO, FLASK, FASTAPI, RUBY, RUBY_ON_RAILS, PHP, LARAVEL, PERL, C, CPP,
+    Java, Spring, SpringBoot, NodeJS, Express, Kotlin, CSharp, DotNet, Go, Rust,
+    Python, Django, Flask, FastAPI, Ruby, RubyOnRails, PHP, Laravel, Perl, C, Cpp,
 
     // Frontend
-    JAVASCRIPT, TYPESCRIPT, REACT, NEXT_JS, VUE, ANGULAR, SVELTE, SOLID_JS, LIT,
-    HTML, CSS, SCSS, TAILWIND_CSS, BOOTSTRAP, MATERIAL_UI,
+    JavaScript, TypeScript, React, NextJS, Vue, Angular, Svelte, SolidJS, Lit,
+    HTML, CSS, SCSS, TailwindCSS, Bootstrap, MaterialUI,
 
     // Mobile
-    FLUTTER, DART, REACT_NATIVE, SWIFT, OBJECTIVE_C, KOTLIN_ANDROID, JAVA_ANDROID, IONIC,
+    Flutter, Dart, ReactNative, Swift, ObjectiveC, KotlinAndroid, JavaAndroid, Ionic,
 
     // DevOps & Infrastructure
-    DOCKER, KUBERNETES, CI_CD, JENKINS, GITHUB_ACTIONS, GITLAB_CI, ANSIBLE, TERRAFORM,
-    PUPPET, CHEF, AWS, GCP, AZURE, HEROKU, DIGITAL_OCEAN, VAGRANT, OPENSHIFT,
+    Docker, Kubernetes, CICD, Jenkins, GitHubActions, GitLabCI, Ansible, Terraform,
+    Puppet, Chef, AWS, GCP, Azure, Heroku, DigitalOcean, Vagrant, OpenShift,
 
     // Cloud Services
-    AWS_LAMBDA, AWS_ECS, AWS_FARGATE, AWS_EKS, AWS_S3, AWS_CLOUDFRONT,
-    AWS_RDS, AWS_DYNAMODB, AWS_API_GATEWAY, AWS_SQS, AWS_SNS,
-    GCP_CLOUD_FUNCTIONS, GCP_BIGQUERY, AZURE_FUNCTIONS,
+    AWSLambda, AWSECS, AWSFargate, AWSEKS, AWSS3, AWSCloudFront,
+    AWSRDS, AWSDynamoDB, AWSAPIGateway, AWSSQS, AWSSNS,
+    GCPCloudFunctions, GCPBigQuery, AzureFunctions,
 
     // Databases
-    MYSQL, POSTGRESQL, ORACLE_DB, SQL_SERVER, MONGODB, CASSANDRA, COUCHDB, NEO4J,
-    REDIS, MEMCACHED, INFLUXDB, TIMESCALEDB, MARIA_DB, SQLITE, FIREBASE_REALTIME_DB,
+    MySQL, PostgreSQL, OracleDB, SQLServer, MongoDB, Cassandra, CouchDB, Neo4j,
+    Redis, Memcached, InfluxDB, TimescaleDB, MariaDB, SQLite, FirebaseRealtimeDB,
 
     // Big Data & Streaming
-    HADOOP, SPARK, KAFKA, KINESIS, FLAKE, REDSHIFT, APACHE_FLINK, APACHE_DRUID,
+    Hadoop, Spark, Kafka, Kinesis, Flink, Redshift, Druid,
 
     // Machine Learning & AI
-    TENSORFLOW, PYTORCH, SCIKIT_LEARN, KERAS, OPENCV, NLTK, TRANSFORMERS,
-    HUGGING_FACE, GPT, FASTAI, DEEPSPEED, NVIDIA_CUDA,
+    TensorFlow, PyTorch, ScikitLearn, Keras, OpenCV, NLTK, Transformers,
+    HuggingFace, GPT, FastAI, DeepSpeed, NvidiaCUDA,
 
     // Security
-    JWT, OAUTH2, SAML, OPENID_CONNECT, HASHICORP_VAULT, SONARQUBE, BURP_SUITE,
-    OWASP_ZAP, SELENIUM_SECURITY, CLOUD_SECURITY,
+    JWT, OAuth2, SAML, OpenIDConnect, HashiCorpVault, SonarQube, BurpSuite,
+    OWASPZAP, SeleniumSecurity, CloudSecurity,
 
     // Networking & Protocols
-    TCP_IP, UDP, HTTP, HTTPS, REST, GRAPHQL, GRPC, MQTT, WEBSOCKETS,
-    WEBRTC, SOCKET_IO, DNS, TLS_SSL, SSH, FTP,
+    TCPIP, UDP, HTTP, HTTPS, REST, GraphQL, GRPC, MQTT, WebSockets,
+    WebRTC, SocketIO, DNS, TLS_SSL, SSH, FTP,
 
     // Testing & QA
-    JUNIT, TESTNG, SELENIUM, CYPRESS, PLAYWRIGHT, APPIUM, CUCUMBER,
-    POSTMAN, KARATE, JEST, MOCHA, CHAI, PYTEST,
+    JUnit, TestNG, Selenium, Cypress, Playwright, Appium, Cucumber,
+    Postman, Karate, Jest, Mocha, Chai, PyTest,
 
     // CI/CD & Build Tools
-    MAVEN, GRADLE, NPM, YARN, PNPM, BAZEL, BROCCOLI, GULP, WEBPACK, PARCEL,
+    Maven, Gradle, NPM, Yarn, PNPM, Bazel, Broccoli, Gulp, Webpack, Parcel,
 
     // Blockchain & Web3
-    BITCOIN, ETHEREUM, SOLIDITY, WEB3_JS, HARDHAT, TRUFFLE, IPFS, HYPERLEDGER,
+    Bitcoin, Ethereum, Solidity, Web3JS, Hardhat, Truffle, IPFS, Hyperledger,
 
     // Game Development
-    UNITY, UNREAL_ENGINE, GODOT, BLENDER, OPENGL, DIRECTX, VULKAN,
+    Unity, UnrealEngine, Godot, Blender, OpenGL, DirectX, Vulkan,
 
     // Miscellaneous
-    GIT, SVN, MERCURIAL, AIRFLOW, KAFKA_CONNECT, PROMETHEUS, GRAFANA,
-    ELK_STACK, LOGSTASH, FILEBEAT, GRAYLOG,
+    Git, SVN, Mercurial, Airflow, KafkaConnect, Prometheus, Grafana,
+    ELKStack, Logstash, Filebeat, Graylog,
 
     // Operating Systems
-    LINUX, WINDOWS_SERVER, MACOS, UNIX, BSD, DOCKER_SWARM,
+    Linux, WindowsServer, macOS, Unix, BSD, DockerSwarm,
 
     // Low-Level & Embedded
-    ASM, RISC_V, ARM_CORTEX, FPGA, MICROPYTHON, ARDUINO, RASPBERRY_PI,
+    ASM, RISC_V, ARMCortex, FPGA, MicroPython, Arduino, RaspberryPi,
 
     // Quantum Computing
-    QISKIT, MICROSOFT_QUANTUM, IBM_Q, D_WAVE;
+    Qiskit, MicrosoftQuantum, IBMQ, DWave;
 }
