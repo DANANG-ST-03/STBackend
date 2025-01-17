@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/project")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ProjectController {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectController.class);
@@ -81,17 +83,18 @@ public class ProjectController {
     }
 
 
+    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/search")
     public ResponseEntity<GlobalResponse> searchProjectsByPage(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<ProjectResponse> searchedEmployees = projectService.searchProjectsByPage(keyword, PageRequest.of(page, size));
+        Page<ProjectResponse> searchedProjects = projectService.searchProjectsByPage(keyword, PageRequest.of(page, size));
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("searched projects success")
-                .data(searchedEmployees).build();
+                .data(searchedProjects).build();
         return ResponseEntity.ok(globalResponse);
     }
 
