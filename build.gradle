@@ -71,6 +71,10 @@ dependencies {
 	// to pdf
 	implementation 'org.xhtmlrenderer:flying-saucer-core:9.1.22'
 	implementation 'org.xhtmlrenderer:flying-saucer-pdf-openpdf:9.1.22'
+
+	// random string
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+
 }
 
 tasks.named('test') {
