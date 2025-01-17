@@ -43,8 +43,9 @@ public class SecurityConfig {
                         .frameOptions(frameOptions -> frameOptions.disable()) // H2 콘솔을 위한 frameOptions 비활성화
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/main", "/signup", "/signup/**", "/signin",
+                        .requestMatchers("/", "/main", "/signin",
                                 "/css/**", "/images/**", "/js/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/signup", "/signup/**").hasRole("SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .logout(logout -> logout
