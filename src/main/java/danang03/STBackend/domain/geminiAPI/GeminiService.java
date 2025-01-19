@@ -1,9 +1,14 @@
 package danang03.STBackend.domain.geminiAPI;
 
+import jakarta.servlet.http.HttpSession;
+import java.lang.reflect.Type;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.util.ArrayList;
@@ -13,6 +18,7 @@ import java.util.Map;
 
 @Service
 @SessionScope
+@Slf4j
 public class GeminiService {
 
     @Value("${gemini.api.key}")
@@ -23,12 +29,16 @@ public class GeminiService {
 
     private final GeminiApi geminiApi;
     private final JdbcTemplate jdbcTemplate;
-    private final Map<String, List<String>> sessionHistory = new HashMap<>();
-    private List<String> schemaCache;
 
-    public GeminiService(GeminiApi geminiApi, JdbcTemplate jdbcTemplate) {
+//    private final Map<String, List<String>> sessionHistory = new HashMap<>();
+    private List<String> schemaCache;
+    private final SessionHistoryRepository sessionHistoryRepository;
+
+
+    public GeminiService(GeminiApi geminiApi, JdbcTemplate jdbcTemplate, SessionHistoryRepository sessionHistoryRepository) {
         this.geminiApi = geminiApi;
         this.jdbcTemplate = jdbcTemplate;
+        this.sessionHistoryRepository = sessionHistoryRepository;
     }
 
     // Initializes the schema cache if it has not been populated yet
@@ -39,19 +49,64 @@ public class GeminiService {
     }
 
     // Add input to session history for a given session ID
+//    public void addToSessionHistory(String sessionId, String input) {
+//        System.out.println("@@@@@@@@@@@@@\n\n\n\n@@@@@@\n\n\n\n@@@@\nsessionId = " + sessionId + "input=" + input + "\n");
+//        log.info("Saving session history - Session ID: {}, Input: {}", sessionId, input);
+//        sessionHistory.computeIfAbsent(sessionId, k -> new ArrayList<>()).add(input);
+//        log.info("Current session history: {}", sessionHistory);
+//    }
+
+//    public void addToSessionHistory(String sessionId, String input) {
+//        // 세션 속성을 가져옴 (없으면 새로운 리스트 생성)
+//        List<String> history = (List<String>) httpSession.getAttribute(sessionId);
+//        if (history == null) {
+//            history = new ArrayList<>();
+//        }
+//        history.add(input);
+//        httpSession.setAttribute(sessionId, history);  // 세션에 저장
+//    }
+    // 세션 히스토리 추가
+    @Transactional
     public void addToSessionHistory(String sessionId, String input) {
-        sessionHistory.computeIfAbsent(sessionId, k -> new ArrayList<>()).add(input);
+        sessionHistoryRepository.save(new SessionHistory(sessionId, input));
     }
+
 
     // Retrieve session history for a given session ID
+//    public List<String> getSessionHistory(String sessionId) {
+//        return sessionHistory.getOrDefault(sessionId, new ArrayList<>());
+//    }
+//    public List<String> getSessionHistory(String sessionId) {
+//        List<String> history = (List<String>) httpSession.getAttribute(sessionId);
+//        return history != null ? history : new ArrayList<>();
+//    }
+    // 특정 세션의 히스토리 조회
     public List<String> getSessionHistory(String sessionId) {
-        return sessionHistory.getOrDefault(sessionId, new ArrayList<>());
+        return sessionHistoryRepository.findBySessionIdOrderByCreatedAtAsc(sessionId)
+                .stream()
+                .map(SessionHistory::getMessage)
+                .toList();
     }
 
+
+
+
+
     // Clear session history for a given session ID
+//    public void clearSessionHistory(String sessionId) {
+//        sessionHistory.remove(sessionId);
+//    }
+//    public void clearSessionHistory(String sessionId) {
+//        httpSession.removeAttribute(sessionId);
+//    }
+    // 특정 세션의 히스토리 삭제
+    @Transactional
     public void clearSessionHistory(String sessionId) {
-        sessionHistory.remove(sessionId);
+        sessionHistoryRepository.deleteBySessionId(sessionId);
     }
+
+
+
 
     // Retrieve table schema for a given table
     public String getTableSchema(String tableName) {
