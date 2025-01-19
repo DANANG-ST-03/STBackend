@@ -1,29 +1,35 @@
 package danang03.STBackend.domain.geminiAPI;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class GeminiRequest {
-    private Content[] contents;
+    private List<Content> contents; // 배열 대신 List 사용
 
     public GeminiRequest(String text) {
-        this.contents = new Content[] { new Content(text) };
+        this.contents = List.of(new Content(text));
     }
 
     @Setter
     @Getter
+    @NoArgsConstructor
     public static class Content {
-        private Part[] parts;
+        private List<Part> parts; // 배열 대신 List 사용
 
         public Content(String text) {
-            this.parts = new Part[] { new Part(text) };
+            this.parts = List.of(new Part(text));
         }
     }
 
     @Setter
     @Getter
+    @NoArgsConstructor
     public static class Part {
         private String text;
 
@@ -32,11 +38,3 @@ public class GeminiRequest {
         }
     }
 }
-//Example of JSON file
-/*
-{
-        "contents": [{
-        "parts":[{"text": "Write a story about a magic backpack."}]
-        }]
-}
-*/
