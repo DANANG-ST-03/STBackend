@@ -181,9 +181,11 @@ public class ProjectService {
             List<EmployeeProject> employeeProjects = employeeProjectRepository.findByProjectId(projectId);
             employeeProjects.stream().
                     map(employeeProject -> {
-                        if (employeeProject.getJoinStatus() != JoinStatus.EXITED) {
-                            throw new IllegalArgumentException("Employee project with id " + employeeProject.getId() + " has joined the project");
-                        }
+                        changeEmployeeJoinStatus(
+                                projectId,
+                                employeeProject.getEmployee().getId(),
+                                new EmployeeProjectChangeJoinStatusRequest(JoinStatus.EXITED)
+                        );
                         return null;
                     });
 

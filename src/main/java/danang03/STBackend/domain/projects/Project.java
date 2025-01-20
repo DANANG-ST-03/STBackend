@@ -9,9 +9,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -28,6 +30,9 @@ public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
     @Setter
     @Column(nullable = false)
@@ -64,13 +69,9 @@ public class Project {
         this.status = ProjectStatus.PENDING;
     }
 
-    // 업데이트를 위한 메서드
-    public void update(String name, String description, ProjectCategory projectCategory, LocalDate startDate, LocalDate endDate, ProjectStatus status) {
-        this.name = name != null ? name : this.name;
-        this.description = description != null ? description : this.description;
-        this.category = projectCategory != null ? projectCategory: this.category;
-        this.startDate = startDate != null ? startDate : this.startDate;
-        this.endDate = endDate != null ? endDate : this.endDate;
-        this.status = status != null ? status : this.status;
+    // 프로젝트 생성 시 자동으로 createdAt 설정
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 }

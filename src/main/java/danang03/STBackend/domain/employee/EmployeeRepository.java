@@ -1,5 +1,6 @@
 package danang03.STBackend.domain.employee;
 
+import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +23,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             "OR LOWER(e.role) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(e.email) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Employee> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+
+    // for dashboard
+    @Query("SELECT COUNT(e) FROM Employee e WHERE e.joiningDate <= :endDate")
+    Integer countEmployeesJoinedBefore(@Param("endDate") LocalDate endDate);
+
+    @Query("SELECT es, COUNT(e) FROM Employee e JOIN e.skills es GROUP BY es")
+    List<Object[]> countSkills();
 }

@@ -65,7 +65,7 @@ public class EmployeeProject {
     @RequiredArgsConstructor
     @Getter
     public enum Role {
-        TEAM_LEADER("Team Reader"),
+        TEAM_LEADER("Team Leader"),
         DESIGNER("Designer"),
         FE_DEVELOPER("Frontend Developer"),
         BE_DEVELOPER("Backend Developer"),
