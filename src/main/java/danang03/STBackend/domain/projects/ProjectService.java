@@ -41,7 +41,7 @@ public class ProjectService {
     }
 
     public Long addProject(ProjectAddRequest request) {
-        Project project = new Project(request.getName(), request.getDescription());
+        Project project = new Project(request.getName(), request.getDescription(), request.getCategory());
         projectRepository.save(project);
 
         return project.getId();
@@ -57,6 +57,7 @@ public class ProjectService {
                 .id(project.getId())
                 .name(project.getName())
                 .description(project.getDescription())
+                .category(project.getCategory())
                 .startDate(project.getStartDate())
                 .endDate(project.getEndDate())
                 .status(project.getStatus()).build();
@@ -116,6 +117,7 @@ public class ProjectService {
                         project.getId(),
                         project.getName(),
                         project.getDescription(),
+                        project.getCategory(),
                         project.getStartDate(),
                         project.getEndDate(),
                         project.getStatus()
@@ -140,6 +142,7 @@ public class ProjectService {
                         .id(project.getId())
                         .name(project.getName())
                         .description(project.getDescription())
+                        .category(project.getCategory())
                         .startDate(project.getStartDate())
                         .endDate(project.getEndDate())
                         .status(project.getStatus()).build()
@@ -151,29 +154,43 @@ public class ProjectService {
 
 
     @Transactional
-    public void updateProject(Long id, ProjectUpdateRequest request) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Project with id " + id + "not found"));
+    public void updateProject(Long projectId, ProjectUpdateRequest request) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project with id " + projectId + "not found"));
 
         project.setName(request.getName());
         project.setDescription(request.getDescription());
+        project.setCategory(request.getCategory());
 
 
         // change status
         ProjectStatus previousStatus = project.getStatus();
         project.setStatus(request.getStatus());
 
-        if (previousStatus == ProjectStatus.PENDING && request.getStatus() == ProjectStatus.WORKING) {
-            project.setStartDate(LocalDate.now());
-        }
-        else if (previousStatus == ProjectStatus.WORKING && request.getStatus() == ProjectStatus.COMPLETE) {
-            project.setEndDate(LocalDate.now());
-        }
-        else if (previousStatus == ProjectStatus.COMPLETE && request.getStatus() == ProjectStatus.WORKING) {
+        if (request.getStatus() == ProjectStatus.PENDING) {
+            project.setStartDate(null);
             project.setEndDate(null);
         }
-        else if (previousStatus == ProjectStatus.WORKING && request.getStatus() == ProjectStatus.PENDING) {
-            project.setStartDate(null);
+        else if (request.getStatus() == ProjectStatus.WORKING) {
+            if (project.getStartDate() == null) {
+                project.setStartDate(LocalDate.now());
+            }
+            project.setEndDate(null);
+        }
+        else if (request.getStatus() == ProjectStatus.COMPLETE) {
+            List<EmployeeProject> employeeProjects = employeeProjectRepository.findByProjectId(projectId);
+            employeeProjects.stream().
+                    map(employeeProject -> {
+                        if (employeeProject.getJoinStatus() != JoinStatus.EXITED) {
+                            throw new IllegalArgumentException("Employee project with id " + employeeProject.getId() + " has joined the project");
+                        }
+                        return null;
+                    });
+
+            if (project.getStartDate() == null) {
+                project.setStartDate(LocalDate.now());
+            }
+            project.setEndDate(LocalDate.now());
         }
 
         projectRepository.save(project);
@@ -246,45 +263,22 @@ public class ProjectService {
         }
 
         if (newJoinStatus == JoinStatus.READY) {
-            employeeProject.setJoinStatus(newJoinStatus);
             employeeProject.setJoinDate(null);
             employeeProject.setExitDate(null);
         }
         else if (newJoinStatus == JoinStatus.DOING) {
-            employeeProject.setJoinStatus(newJoinStatus);
-            employeeProject.setJoinDate(LocalDate.now());
-            employeeProject.setExitDate(null);
+            if (employeeProject.getJoinDate() == null) {
+                employeeProject.setJoinDate(LocalDate.now());
+            }            employeeProject.setExitDate(null);
         }
         else if (newJoinStatus == JoinStatus.EXITED) {
-            employeeProject.setJoinStatus(newJoinStatus);
+            if (employeeProject.getJoinDate() == null) {
+                employeeProject.setJoinDate(LocalDate.now());
+            }
             employeeProject.setExitDate(LocalDate.now());
         }
 
-//        if (previousJoinStatus == JoinStatus.READY && newJoinStatus == JoinStatus.DOING) {
-//            employeeProject.setJoinStatus(newJoinStatus);
-//            employeeProject.setJoinDate(LocalDate.now());
-//        }
-//        else if (previousJoinStatus == JoinStatus.DOING && newJoinStatus == JoinStatus.EXITED) {
-//            employeeProject.setJoinStatus(newJoinStatus);
-//            employeeProject.setExitDate(LocalDate.now());
-//        }
-//
-//        else if (previousJoinStatus == JoinStatus.EXITED && newJoinStatus == JoinStatus.DOING) {
-//            employeeProject.setJoinStatus(newJoinStatus);
-//            employeeProject.setExitDate(null);
-//        }
-//
-//        // 추가 논의 필요
-//        else if (previousJoinStatus == JoinStatus.DOING && newJoinStatus == JoinStatus.READY) {
-//            employeeProject.setJoinStatus(newJoinStatus);
-//            employeeProject.setJoinDate(null);
-//        }
-//        else if (previousJoinStatus == JoinStatus.READY && newJoinStatus == JoinStatus.EXITED) {
-//            employeeProject.setJoinStatus(newJoinStatus);
-//            employeeProject.setExitDate(null);
-//        }
-
-
+        employeeProject.setJoinStatus(newJoinStatus);
 
         employeeProjectRepository.save(employeeProject);
     }
