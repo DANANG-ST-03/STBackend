@@ -41,7 +41,7 @@ public class ProjectService {
     }
 
     public Long addProject(ProjectAddRequest request) {
-        Project project = new Project(request.getName(), request.getDescription());
+        Project project = new Project(request.getName(), request.getDescription(), request.getCategory());
         projectRepository.save(project);
 
         return project.getId();
@@ -57,6 +57,7 @@ public class ProjectService {
                 .id(project.getId())
                 .name(project.getName())
                 .description(project.getDescription())
+                .category(project.getCategory())
                 .startDate(project.getStartDate())
                 .endDate(project.getEndDate())
                 .status(project.getStatus()).build();
@@ -116,6 +117,7 @@ public class ProjectService {
                         project.getId(),
                         project.getName(),
                         project.getDescription(),
+                        project.getCategory(),
                         project.getStartDate(),
                         project.getEndDate(),
                         project.getStatus()
@@ -140,6 +142,7 @@ public class ProjectService {
                         .id(project.getId())
                         .name(project.getName())
                         .description(project.getDescription())
+                        .category(project.getCategory())
                         .startDate(project.getStartDate())
                         .endDate(project.getEndDate())
                         .status(project.getStatus()).build()
