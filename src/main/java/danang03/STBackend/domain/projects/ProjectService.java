@@ -160,6 +160,7 @@ public class ProjectService {
 
         project.setName(request.getName());
         project.setDescription(request.getDescription());
+        project.setCategory(request.getCategory());
 
 
         // change status
