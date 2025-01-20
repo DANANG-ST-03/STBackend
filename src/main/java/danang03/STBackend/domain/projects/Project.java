@@ -38,6 +38,7 @@ public class Project {
 
     @Enumerated(EnumType.STRING)  // Enum 값을 문자열로 저장
     @Column(nullable = false)
+    @Setter
     private ProjectCategory category;
 
     @Setter
