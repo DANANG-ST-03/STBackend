@@ -185,7 +185,7 @@ public class ProjectService {
             employeeProjects.stream().
                     map(employeeProject -> {
                         if (employeeProject.getJoinStatus() != JoinStatus.EXITED) {
-                            throw new IllegalArgumentException("Employee project with id " + employeeProject.getId() + " has joined the project");
+                            throw new IllegalArgumentException("Employee " + employeeProject.getEmployee().getName() + " has joined the project");
                         }
                         return null;
                     });
