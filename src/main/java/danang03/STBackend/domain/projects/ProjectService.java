@@ -157,9 +157,6 @@ public class ProjectService {
     public void updateProject(Long projectId, ProjectUpdateRequest request) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project with id " + projectId + "not found"));
-        if (!employeeProjectRepository.existsByProjectId(projectId)) {
-            throw new IllegalArgumentException("Project with id " + projectId + " has no assigned employee.");
-        }
 
         project.setName(request.getName());
         project.setDescription(request.getDescription());
@@ -184,9 +181,11 @@ public class ProjectService {
             List<EmployeeProject> employeeProjects = employeeProjectRepository.findByProjectId(projectId);
             employeeProjects.stream().
                     map(employeeProject -> {
-                        if (employeeProject.getJoinStatus() != JoinStatus.EXITED) {
-                            throw new IllegalArgumentException("Employee " + employeeProject.getEmployee().getName() + " has joined the project");
-                        }
+                        changeEmployeeJoinStatus(
+                                projectId,
+                                employeeProject.getEmployee().getId(),
+                                new EmployeeProjectChangeJoinStatusRequest(JoinStatus.EXITED)
+                        );
                         return null;
                     });
 
