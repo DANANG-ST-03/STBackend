@@ -4,7 +4,9 @@ import danang03.STBackend.domain.employee.Skill;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Getter
 public class UpdateEmployeeRequest {
     private String name;

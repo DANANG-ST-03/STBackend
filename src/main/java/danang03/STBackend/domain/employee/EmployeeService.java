@@ -222,6 +222,7 @@ public class EmployeeService {
                 request.getRole()
         );
 
+        employeeRepository.save(employee);
     }
 
 
