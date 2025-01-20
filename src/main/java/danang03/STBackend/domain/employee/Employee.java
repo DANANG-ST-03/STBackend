@@ -55,6 +55,14 @@ public class Employee {
 
     // 업데이트를 위한 메서드
     public void update(String name, String email, String contact, List<Skill> skills, LocalDate joiningDate, String role) {
+        if (name.contains(" ")) {
+            firstName = name.split(" ")[0];
+            lastName = name.split(" ")[1];
+        } else {
+            firstName = name;
+            lastName = null;
+        }
+
         this.name = name != null ? name : this.name;
         this.email = email != null ? email : this.email;
         this.contact = contact != null ? contact : this.contact;
