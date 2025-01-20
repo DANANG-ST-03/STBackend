@@ -106,20 +106,22 @@ public class GeminiService {
 
         // Combine history with the current prompt
         StringBuilder promptBuilder = new StringBuilder();
-        promptBuilder.append("Current Query: ").append(naturalLanguagePrompt).append("\n\n");
 
-        promptBuilder.append("Instructions: You are HR Buddy, a virtual assistant to help find information about employees or projects in ST United.\n");
-        promptBuilder.append("1. If the input involves a name or project, generate a precise SQL query to retrieve relevant data.\n");
-        promptBuilder.append("2. If the input is a general greeting (e.g., 'hello'), respond conversationally without SQL.\n");
-        promptBuilder.append("3. Use case-insensitive matching (LOWER or ILIKE) for names or project searches.\n");
-        promptBuilder.append("4. Avoid assumptions and respond clearly and concisely, without rephrasing the input unnecessarily.\n");
+        promptBuilder.append("\nYou are HR Buddy, a virtual assistant for retrieving information about employees or projects in ST United.\n")
+                .append("1. If the input mentions an employee or project, generate a case-insensitive SQL query (use LOWER() or ILIKE).\n")
+                .append("2. Use session history only when pronouns (e.g., 'he', 'she', 'they', 'the project') are present.\n")
+                .append("3. For unclear inputs, refer to history and table schemas as needed.\n")
+                .append("4. For greetings like 'hello', respond conversationally without SQL.\n")
+                .append("5. Avoid technical language (e.g., 'query', 'SQL', 'schemas') in responses. Use simple, user-friendly terms.\n\n");
+
+        promptBuilder.append("Current Query: ").append(naturalLanguagePrompt).append("\n");
 
         String generatedResponse = generateSQLFromPrompt(String.valueOf(promptBuilder), history);
+        logger.info("Generated Response: {}", generatedResponse);
 
         // If SQL is generated, execute it and return the results
         if (generatedResponse.contains("SELECT")) {
             String rawSQLQuery = sanitizeSQLQuery(generatedResponse);
-            System.out.println("rawSQLQuery: \n" +rawSQLQuery);
             try {
                 List<Map<String, Object>> queryResults = executeSQLQuery(rawSQLQuery);
                 if (queryResults.isEmpty()) {
@@ -143,13 +145,13 @@ public class GeminiService {
             schemaBuilder.append(schema).append("\n\n");
         }
 
-        StringBuilder historyContext = new StringBuilder("Refer to the session history for additional context:\n");
-        for (String historyItem : history) {
-            historyContext.append(historyItem).append("\n");
-        }
-
         String fullPrompt = schemaBuilder.toString() +
-                historyContext + naturalLanguagePrompt;
+                "Recent History:\n" + history + naturalLanguagePrompt +
+                "If you can generate an SQL query based on the input and schemas, provide only the SQL without additional text.\n"
+                + "Or you can generate a simple sentence as a HR Buddy(e.g., Hi! What can I do for you?)";
+
+        logger.info("Full prompt: {}", fullPrompt);
+
 
         GeminiRequest request = new GeminiRequest(fullPrompt);
         logger.info("Full prompt: {}", fullPrompt);
@@ -190,7 +192,6 @@ public class GeminiService {
                 "Process the provided data as-is and convert it into user-friendly language(ex. don't use word 'query') by listing the values clearly. " +
                         "For example:\n" +
                         "{name=Alexander Jade}\\n{name=Alice Brown} should be transformed into Alexander Jade, Alice Brown.\n" +
-                        "{name=Website Revamp, description=Complete redesign of the company website}\\The project 'Website Revamp' involves a complete redesign of the company website.\n" +
                         "While avoiding assumptions or unrelated information, you may adjust the sentence structure. \n"
         );
         for (Map<String, Object> row : queryResults) {
