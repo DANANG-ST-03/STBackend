@@ -40,8 +40,8 @@ public class Employee {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(length = 10, nullable = false) // DB에서도 10자리 제한
-    @Pattern(regexp = "\\d{10}", message = "Contact number must be exactly 10 digits")
+//    @Column(length = 10, nullable = false) // DB에서도 10자리 제한
+//    @Pattern(regexp = "\\d{10}", message = "Contact number must be exactly 10 digits")
     private String contact;
 
     @ElementCollection(fetch = FetchType.EAGER)
