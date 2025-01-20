@@ -1,8 +1,5 @@
 package danang03.STBackend.domain.geminiAPI;
 
-import jakarta.servlet.http.HttpSession;
-import java.lang.reflect.Type;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,9 +7,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.annotation.SessionScope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +28,9 @@ public class GeminiService {
     private final GeminiApi geminiApi;
     private final JdbcTemplate jdbcTemplate;
 
-//    private final Map<String, List<String>> sessionHistory = new HashMap<>();
     private List<String> schemaCache;
     private final SessionHistoryRepository sessionHistoryRepository;
-
+    private static final Logger logger = LoggerFactory.getLogger(GeminiService.class);
 
     public GeminiService(GeminiApi geminiApi, JdbcTemplate jdbcTemplate, SessionHistoryRepository sessionHistoryRepository) {
         this.geminiApi = geminiApi;
@@ -49,38 +46,12 @@ public class GeminiService {
     }
 
     // Add input to session history for a given session ID
-//    public void addToSessionHistory(String sessionId, String input) {
-//        System.out.println("@@@@@@@@@@@@@\n\n\n\n@@@@@@\n\n\n\n@@@@\nsessionId = " + sessionId + "input=" + input + "\n");
-//        log.info("Saving session history - Session ID: {}, Input: {}", sessionId, input);
-//        sessionHistory.computeIfAbsent(sessionId, k -> new ArrayList<>()).add(input);
-//        log.info("Current session history: {}", sessionHistory);
-//    }
-
-//    public void addToSessionHistory(String sessionId, String input) {
-//        // 세션 속성을 가져옴 (없으면 새로운 리스트 생성)
-//        List<String> history = (List<String>) httpSession.getAttribute(sessionId);
-//        if (history == null) {
-//            history = new ArrayList<>();
-//        }
-//        history.add(input);
-//        httpSession.setAttribute(sessionId, history);  // 세션에 저장
-//    }
-    // 세션 히스토리 추가
     @Transactional
     public void addToSessionHistory(String sessionId, String input) {
         sessionHistoryRepository.save(new SessionHistory(sessionId, input));
     }
 
-
     // Retrieve session history for a given session ID
-//    public List<String> getSessionHistory(String sessionId) {
-//        return sessionHistory.getOrDefault(sessionId, new ArrayList<>());
-//    }
-//    public List<String> getSessionHistory(String sessionId) {
-//        List<String> history = (List<String>) httpSession.getAttribute(sessionId);
-//        return history != null ? history : new ArrayList<>();
-//    }
-    // 특정 세션의 히스토리 조회
     public List<String> getSessionHistory(String sessionId) {
         return sessionHistoryRepository.findBySessionIdOrderByCreatedAtAsc(sessionId)
                 .stream()
@@ -88,25 +59,11 @@ public class GeminiService {
                 .toList();
     }
 
-
-
-
-
     // Clear session history for a given session ID
-//    public void clearSessionHistory(String sessionId) {
-//        sessionHistory.remove(sessionId);
-//    }
-//    public void clearSessionHistory(String sessionId) {
-//        httpSession.removeAttribute(sessionId);
-//    }
-    // 특정 세션의 히스토리 삭제
     @Transactional
     public void clearSessionHistory(String sessionId) {
         sessionHistoryRepository.deleteBySessionId(sessionId);
     }
-
-
-
 
     // Retrieve table schema for a given table
     public String getTableSchema(String tableName) {
@@ -147,14 +104,8 @@ public class GeminiService {
         // Retrieve session history
         List<String> history = getSessionHistory(sessionId);
 
-        // Focus on the most recent 3 history items
-        List<String> recentHistory = history.subList(Math.max(history.size() - 3, 0), history.size());
-
         // Combine history with the current prompt
-        StringBuilder promptBuilder = new StringBuilder("Session History:\n");
-        for (String pastInput : recentHistory) {
-            promptBuilder.append(pastInput).append("\n");
-        }
+        StringBuilder promptBuilder = new StringBuilder();
         promptBuilder.append("Current Query: ").append(naturalLanguagePrompt).append("\n\n");
 
         promptBuilder.append("Instructions: You are HR Buddy, a virtual assistant to help find information about employees or projects in ST United.\n");
@@ -185,7 +136,7 @@ public class GeminiService {
     }
 
     // Generates an SQL query from a natural language prompt and recent session history
-    public String generateSQLFromPrompt(String naturalLanguagePrompt, List<String> recentHistory) {
+    public String generateSQLFromPrompt(String naturalLanguagePrompt, List<String> history) {
         initializeSchemaCache();
         StringBuilder schemaBuilder = new StringBuilder("Based on the following table schemas:\n\n");
         for (String schema : schemaCache) {
@@ -193,7 +144,7 @@ public class GeminiService {
         }
 
         StringBuilder historyContext = new StringBuilder("Refer to the session history for additional context:\n");
-        for (String historyItem : recentHistory) {
+        for (String historyItem : history) {
             historyContext.append(historyItem).append("\n");
         }
 
@@ -201,7 +152,7 @@ public class GeminiService {
                 historyContext + naturalLanguagePrompt;
 
         GeminiRequest request = new GeminiRequest(fullPrompt);
-        System.out.println(request);
+        logger.info("Full prompt: {}", fullPrompt);
         GeminiResponse response = geminiApi.generateContent(model, request, apiKey);
 
         return response.getCandidates().stream()
@@ -240,7 +191,7 @@ public class GeminiService {
                         "For example:\n" +
                         "{name=Alexander Jade}\\n{name=Alice Brown} should be transformed into Alexander Jade, Alice Brown.\n" +
                         "{name=Website Revamp, description=Complete redesign of the company website}\\The project 'Website Revamp' involves a complete redesign of the company website.\n" +
-                        "While avoiding assumptions or unrelated information, you may adjust the sentence structure. "
+                        "While avoiding assumptions or unrelated information, you may adjust the sentence structure. \n"
         );
         for (Map<String, Object> row : queryResults) {
             resultsBuilder.append(row.toString()).append("\n");
