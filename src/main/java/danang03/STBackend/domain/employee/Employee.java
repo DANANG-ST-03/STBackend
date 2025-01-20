@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,9 @@ public class Employee {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(length = 10, nullable = false) // DB에서도 10자리 제한
+    @Pattern(regexp = "\\d{10}", message = "Contact number must be exactly 10 digits")
     private String contact;
 
     @ElementCollection(fetch = FetchType.EAGER)
