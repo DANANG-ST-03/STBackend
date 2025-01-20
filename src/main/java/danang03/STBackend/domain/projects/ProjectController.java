@@ -2,6 +2,7 @@ package danang03.STBackend.domain.projects;
 
 import danang03.STBackend.domain.projects.dto.EmployeeProjectAssignmentResponse;
 import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeJoinStatusRequest;
+import danang03.STBackend.domain.projects.dto.EmployeeProjectChangeRoleRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddRequest;
 import danang03.STBackend.domain.projects.dto.ProjectAddResponse;
 import danang03.STBackend.domain.projects.dto.ProjectDetailResponse;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/project")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ProjectController {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectController.class);
@@ -79,6 +82,24 @@ public class ProjectController {
         return ResponseEntity.ok(globalResponse);
     }
 
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @GetMapping("/search")
+    public ResponseEntity<GlobalResponse> searchProjectsByPage(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<ProjectResponse> searchedProjects = projectService.searchProjectsByPage(keyword, PageRequest.of(page, size));
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("searched projects success")
+                .data(searchedProjects).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
+
+
     @PutMapping("/{id}")
     public ResponseEntity<GlobalResponse> updateProject(@PathVariable Long id, @RequestBody ProjectUpdateRequest request) {
         projectService.updateProject(id, request);
@@ -104,6 +125,9 @@ public class ProjectController {
         log.info("Delete project successfully");
         return ResponseEntity.ok(globalResponse);
     }
+
+
+
 
 
     // 프로젝트에 직원을 배정
@@ -140,12 +164,26 @@ public class ProjectController {
         return ResponseEntity.ok(globalResponse);
     }
 
-    @DeleteMapping("/{projectId}/employee")
+    @PutMapping("/{projectId}/employee/{employeeId}/role")
+    public ResponseEntity<GlobalResponse> changeEmployeeRole(
+            @PathVariable Long projectId,
+            @PathVariable Long employeeId,
+            @RequestBody EmployeeProjectChangeRoleRequest request
+    ) {
+        projectService.changeEmployeeProjectRole(projectId, employeeId, request);
+        GlobalResponse globalResponse = GlobalResponse.builder()
+                .status(200)
+                .message("EmployeeRole changed to " + request.getRole().toString() + " successfully")
+                .data(null).build();
+        return ResponseEntity.ok(globalResponse);
+    }
+
+    @DeleteMapping("/{projectId}/employee/{employeeId}")
     public ResponseEntity<GlobalResponse> removeEmployeesFromProject(
             @PathVariable Long projectId,
-            @RequestParam List<Long> employeeIds) {
+            @PathVariable Long employeeId) {
 
-        projectService.removeEmployeesFromProject(projectId, employeeIds);
+        projectService.removeEmployeesFromProject(projectId, employeeId);
         GlobalResponse globalResponse = GlobalResponse.builder()
                 .status(200)
                 .message("Employee removed from project successfully")

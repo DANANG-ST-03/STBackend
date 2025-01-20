@@ -36,6 +36,11 @@ public class Project {
     @Setter
     private String description;
 
+    @Enumerated(EnumType.STRING)  // Enum 값을 문자열로 저장
+    @Column(nullable = false)
+    @Setter
+    private ProjectCategory category;
+
     @Setter
     private LocalDate startDate;
 
@@ -50,22 +55,20 @@ public class Project {
     private List<EmployeeProject> employeeProjects = new ArrayList<>();
 
 
-    public Project(String name, String description, ProjectStatus status) {
+    public Project(String name, String description, ProjectCategory category) {
         this.name = name;
         this.description = description;
+        this.category = category;
         this.startDate = null;
         this.endDate = null;
-        this.status = status;
-
-        if (status == ProjectStatus.WORKING) {
-            startDate = LocalDate.now();
-        }
+        this.status = ProjectStatus.PENDING;
     }
 
     // 업데이트를 위한 메서드
-    public void update(String name, String description, LocalDate startDate, LocalDate endDate, ProjectStatus status) {
+    public void update(String name, String description, ProjectCategory projectCategory, LocalDate startDate, LocalDate endDate, ProjectStatus status) {
         this.name = name != null ? name : this.name;
         this.description = description != null ? description : this.description;
+        this.category = projectCategory != null ? projectCategory: this.category;
         this.startDate = startDate != null ? startDate : this.startDate;
         this.endDate = endDate != null ? endDate : this.endDate;
         this.status = status != null ? status : this.status;

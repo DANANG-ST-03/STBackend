@@ -3,19 +3,25 @@ package danang03.STBackend.domain.member;
 import danang03.STBackend.config.auth.JwtTokenProvider;
 import danang03.STBackend.config.auth.dto.JwtToken;
 import danang03.STBackend.config.auth.dto.SignUpRequest;
-import danang03.STBackend.domain.member.dto.MemberDto;
+import danang03.STBackend.domain.member.dto.PasswordChangeRequest;
+import danang03.STBackend.domain.member.dto.MemberResponse;
+import danang03.STBackend.domain.member.dto.PasswordResetResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.lang3.RandomStringUtils;
+
 
 @RequiredArgsConstructor
 @Service
@@ -83,21 +89,69 @@ public class MemberService {
 
         } catch (Exception e) {
             // 인증 실패 시 명시적으로 예외 발생
-            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
+            throw new IllegalArgumentException("email or password is incorrect.");
         }
     }
 
-    public Page<MemberDto> getMembersDto(Pageable pageable) {
-        return memberRepository.findAll(pageable)
-                .map(member -> new MemberDto(
+    public Page<MemberResponse> getMembersByPage(Pageable pageable) {
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(
+                        Sort.Order.asc("id")
+                )
+        );
+
+        return memberRepository.findAll(sortedPageable)
+                .map(member -> new MemberResponse(
                         member.getId(),
                         member.getName(),
                         member.getUsername(),
                         member.getEmail(),
-                        member.getPicture()
+                        member.getRole()
                 ));
     }
-    public Page<Member> getMembers(Pageable pageable) {
-        return memberRepository.findAll(pageable);
+
+    @Transactional
+    public void changePassword(PasswordChangeRequest request) {
+        String oldPassword = request.getOldPassword();
+        String newPassword = request.getNewPassword();
+
+        // 현재 로그인한 사용자 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName(); // 현재 로그인한 사용자의 이메일 가져오기
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("cannot find member with email: " + email));
+
+        // 기존 비밀번호 검증
+        if (!passwordEncoder.matches(oldPassword, member.getPassword())) {
+            throw new IllegalArgumentException("old password is incorrect.");
+        }
+
+        // 새 비밀번호 암호화 후 저장
+        member.setPassword(passwordEncoder.encode(newPassword));
+        memberRepository.save(member);
+    }
+
+
+    @Transactional
+    public PasswordResetResponse resetPassword(Long memberId) {
+        // memberId로 사용자 찾기
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("cannot find member with id: " + memberId));
+
+        String newPassword =  RandomStringUtils.randomAlphanumeric(8);
+        // 새 비밀번호 암호화 후 저장
+        member.setPassword(passwordEncoder.encode(newPassword));
+        memberRepository.save(member);
+
+        PasswordResetResponse passwordResetResponse = new PasswordResetResponse(
+                newPassword,
+                memberId,
+                member.getName(),
+                member.getEmail()
+        );
+        return passwordResetResponse;
     }
 }

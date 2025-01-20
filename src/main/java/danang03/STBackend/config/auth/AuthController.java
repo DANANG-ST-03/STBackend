@@ -8,6 +8,7 @@ import danang03.STBackend.config.auth.dto.SigninRequest;
 import danang03.STBackend.domain.member.Member;
 import danang03.STBackend.domain.member.MemberRepository;
 import danang03.STBackend.domain.member.MemberService;
+import danang03.STBackend.domain.member.Role;
 import danang03.STBackend.dto.GlobalResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -102,7 +103,12 @@ public class AuthController {
 
             // 응답 바디를 구성하여 클라이언트에 추가 데이터 반환
             Member member = memberRepository.findByEmail(email).orElse(null);
-            SignInResponse signInResponse = new SignInResponse(member.getId(), jwtToken);
+            SignInResponse signInResponse = new SignInResponse(
+                    member.getId(),
+                    member.getName(),
+                    member.getEmail(),
+                    member.getRole(),
+                    jwtToken);
             GlobalResponse globalResponse = GlobalResponse.builder()
                     .status(200)
                     .message("signin success")

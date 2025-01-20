@@ -1,12 +1,17 @@
 package danang03.STBackend.domain.employee;
 
 import danang03.STBackend.domain.projects.EmployeeProject;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,13 +33,18 @@ public class Employee {
 
     @Column(nullable = false)
     private String name;
-    private String first_name;
-    private String last_name;
+    private String firstName;
+    private String lastName;
 
     @Column(nullable = false, unique = true)
     private String email;
     private String contact;
-    private String skills;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "employee_skills", joinColumns = @JoinColumn(name = "employee_id"))
+    @Enumerated(EnumType.STRING)
+    private List<Skill> skills = new ArrayList<>();
+
     private LocalDate joiningDate;
     private String role;
     private String imageUrl;
@@ -44,13 +54,24 @@ public class Employee {
 
 
     // 업데이트를 위한 메서드
-    public void update(String name, String email, String contact, String skills, LocalDate joiningDate, String role) {
+    public void update(String name, String email, String contact, List<Skill> skills, LocalDate joiningDate, String role) {
+        if (name.contains(" ")) {
+            firstName = name.split(" ")[0];
+            lastName = name.split(" ")[1];
+        } else {
+            firstName = name;
+            lastName = null;
+        }
+
         this.name = name != null ? name : this.name;
         this.email = email != null ? email : this.email;
         this.contact = contact != null ? contact : this.contact;
-        this.skills = skills != null ? skills : this.skills;
         this.joiningDate = joiningDate != null ? joiningDate : this.joiningDate;
         this.role = role != null ? role : this.role;
+
+        // skills 업데이트 처리
+            this.skills.clear();
+            this.skills.addAll(skills);
     }
 
     public void updateImage(String imageUrl) {

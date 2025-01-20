@@ -26,7 +26,6 @@ public class GeminiController {
             @RequestBody String rawJson) throws JsonProcessingException { // JSON 요청을 String으로 받아보기 (디버깅)
 
         log.info("Session-ID (Raw): '{}' (Type: {})", sessionId, sessionId.getClass().getSimpleName());
-
         log.info("Received raw JSON: {}", rawJson); // JSON 구조 확인
 
         // JSON을 수동으로 객체로 변환
@@ -41,7 +40,6 @@ public class GeminiController {
         // AI Processing
         String response = geminiService.processNaturalLanguageQuery(userInput, sessionId);
         geminiService.addToSessionHistory(sessionId, "Answer: "  + response);
-
         System.out.println("@@@@@@@Session history: " + geminiService.getSessionHistory(sessionId));
         return ResponseEntity.ok(
                 GlobalResponse.builder()

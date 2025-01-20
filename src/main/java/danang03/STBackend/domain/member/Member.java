@@ -8,12 +8,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
-import jakarta.persistence.Table;
 import java.util.Collection;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -32,46 +32,35 @@ public class Member implements UserDetails {
     private String email;
 
     @Column
-    private String picture;
-
-    @Column
+    @Setter
     private String password;
 
-    private String contact;
+//    @Column
+//    private String imageUrl;
 
-    private String skills;
 
-    private LocalDate joiningDate;
+//    private String contact;
+
+//    private String skills;
+
+//    private LocalDate joiningDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
     @Builder
-    public Member(String name, String email, String picture, String password, String contact, String skills, LocalDate joiningDate, Role role) {
+    public Member(String name, String email, String imageUrl, String password, Role role) {
         this.name = name;
         this.email = email;
-        this.picture = picture;
         this.password = password;
-        this.contact = contact;
-        this.skills = skills;
-        this.joiningDate = joiningDate;
         this.role = role;
     }
-
-//    @Builder
-//    public Member(String name, String password, String email, String picture, Role role) {
-//        this.name = name;
-//        this.password = password;
-//        this.email = email;
-//        this.picture = picture;
-//        this.role = role;
-//    }
 
     // 소셜로그인으로 구글에서 데이터 받아와서 업데이트하는 함수
     public Member update(String name, String picture) {
         this.name = name;
-        this.picture = picture;
+//        this.imageUrl = picture;
         return this;
     }
 

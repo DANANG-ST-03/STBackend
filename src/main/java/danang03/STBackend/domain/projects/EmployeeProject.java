@@ -14,7 +14,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.stereotype.Service;
 
 @Entity
 @Getter
@@ -34,13 +36,15 @@ public class EmployeeProject {
     @JoinColumn(name = "project", nullable = false)
     private Project project;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private Role role;
 
     private String contribution;
 
-
+    @Setter
     private LocalDate joinDate;
+
     @Setter
     private LocalDate exitDate;
 
@@ -53,21 +57,26 @@ public class EmployeeProject {
         this.project = project;
         this.role = role;
         this.contribution = contribution;
-        this.joinDate = LocalDate.now();
+        this.joinDate = null;
         this.exitDate = null;
-        this.joinStatus = JoinStatus.DOING;
+        this.joinStatus = JoinStatus.READY;
     }
 
+    @RequiredArgsConstructor
+    @Getter
     public enum Role {
-        TEAM_LEADER,
-        DESIGNER,
-        FE_DEVELOPER,
-        BE_DEVELOPER,
-        AI_ENGINEER,
-        TESTER
+        TEAM_LEADER("Team Reader"),
+        DESIGNER("Designer"),
+        FE_DEVELOPER("Frontend Developer"),
+        BE_DEVELOPER("Backend Developer"),
+        AI_ENGINEER("AI Engineer"),
+        TESTER("Tester");
+
+        private final String displayText;
     }
 
     public enum JoinStatus {
+        READY,
         DOING,
         EXITED
     }
